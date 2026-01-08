@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -23,14 +24,7 @@ export default function Home() {
         {/* Content Area */}
         <div className="p-8 space-y-6">
           <div className="flex flex-col items-center gap-4">
-            <Image
-              src="/next.svg"
-              alt="Blog Logo"
-              width={180}
-              height={37}
-              priority
-            />
-            <h1 className="text-4xl font-bold text-[#003399]" style={{ fontFamily: 'Tahoma, Arial, sans-serif' }}>
+            <h1 className="text-4xl font-bold text-[#003399]">
               상병 윤민규의 블로그
             </h1>
           </div>
@@ -48,11 +42,13 @@ export default function Home() {
 
           {/* XP Style Button */}
           <div className="flex justify-center">
-            <button className="bg-gradient-to-b from-[#EBF4FF] to-[#C1D2EE] border-2 border-[#003399] rounded px-6 py-2 shadow-md hover:from-[#FFF4E6] hover:to-[#FFE6C1] active:shadow-inner">
-              <span className="font-bold text-sm text-[#003399]" style={{ fontFamily: 'Tahoma, Arial, sans-serif' }}>
-                시작
-              </span>
-            </button>
+            <Link href="/blog">
+              <button className="bg-gradient-to-b from-[#EBF4FF] to-[#C1D2EE] border-2 border-[#003399] rounded px-6 py-2 shadow-md hover:from-[#FFF4E6] hover:to-[#FFE6C1] active:shadow-inner">
+                <span className="font-bold text-sm text-[#003399]">
+                  블로그 보기
+                </span>
+              </button>
+            </Link>
           </div>
         </div>
 

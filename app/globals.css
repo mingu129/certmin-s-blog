@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'DungGeunMo';
+  src: url('/fonts/DungGeunMo.woff2') format('woff2'),
+       url('/fonts/DungGeunMo.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -22,5 +31,9 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'DungGeunMo', Arial, Helvetica, sans-serif;
+}
+
+* {
+  font-family: 'DungGeunMo', Arial, Helvetica, sans-serif;
 }

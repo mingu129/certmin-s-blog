@@ -12,6 +12,26 @@ function verifyToken(token: string): boolean {
   return token === expected;
 }
 
+export async function GET() {
+  try {
+    const slugs = await redis.zrevrange('kv:posts', 0, -1);
+    if (!slugs || slugs.length === 0) return NextResponse.json({ posts: [] });
+
+    const posts = await Promise.all(
+      slugs.map(async (slug) => {
+        const raw = await redis.get(`kv:post:${slug}`);
+        if (!raw) return null;
+        const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        return { slug: data.slug, title: data.title, date: data.date, updatedAt: data.updatedAt };
+      })
+    );
+
+    return NextResponse.json({ posts: posts.filter(Boolean) });
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const cookieHeader = request.headers.get('cookie') || '';

@@ -10,6 +10,7 @@ export interface PostData {
   title: string;
   date: string;
   content: string;
+  updatedAt?: string;
 }
 
 function getFilePosts(): PostData[] {

@@ -26,7 +26,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
       <div className="post-card">
         <div className="post-header">
           <h1 className="post-main-title">{post.title}</h1>
-          <div className="post-meta">{post.date}</div>
+          <div className="post-meta">
+            작성일: {post.date}
+            {post.updatedAt && (
+              <span style={{ marginLeft: '12px', color: 'var(--text-muted)' }}>
+                · 수정일: {post.updatedAt}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="post-content">

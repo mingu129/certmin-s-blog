@@ -16,18 +16,33 @@ export default function AdminWritePage() {
     setLoading(true);
     setError('');
 
-    const res = await fetch('/api/admin/posts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content }),
-    });
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
 
-    if (res.ok) {
+      const res = await fetch('/api/admin/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, content }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
       const data = await res.json();
-      router.push(`/blog/${data.slug}`);
-    } else {
-      const data = await res.json();
-      setError(data.error || '저장 실패');
+
+      if (res.ok) {
+        router.push(`/blog/${data.slug}`);
+      } else {
+        setError(data.error || '저장 실패');
+        setLoading(false);
+      }
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('요청 시간 초과. 네트워크를 확인해주세요.');
+      } else {
+        setError(`오류: ${err instanceof Error ? err.message : String(err)}`);
+      }
       setLoading(false);
     }
   }

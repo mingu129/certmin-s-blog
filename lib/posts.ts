@@ -24,7 +24,7 @@ export function getAllPosts(): PostData[] {
       return {
         slug,
         title: data.title || slug,
-        date: data.date || '',
+        date: data.date ? String(data.date).slice(0, 10) : '',
         content,
       };
     });
@@ -48,7 +48,7 @@ export function getPostBySlug(slug: string): PostData | null {
     return {
       slug,
       title: data.title || slug,
-      date: data.date || '',
+      date: data.date ? String(data.date).slice(0, 10) : '',
       content,
     };
   } catch (error) {

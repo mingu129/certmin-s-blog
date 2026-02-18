@@ -4,15 +4,18 @@ import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 
 export async function generateStaticParams() {
-  const posts = getAllPosts();
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+  // 파일 기반 포스트만 빌드 시 정적 생성, KV 포스트는 요청 시 동적 렌더링
+  const posts = await getAllPosts();
+  return posts
+    .filter((p) => !p.slug.match(/^\d{4}-\d{2}-\d{2}-.*-\d{13}$/)) // KV slug 제외
+    .map((post) => ({ slug: post.slug }));
 }
+
+export const dynamicParams = true;
 
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
 
   if (!post) {
     notFound();

@@ -1,0 +1,40 @@
+import { NextResponse } from 'next/server';
+import { redis } from '@/lib/redis';
+import crypto from 'crypto';
+
+function verifyToken(token: string): boolean {
+  const password = process.env.ADMIN_PASSWORD;
+  if (!password) return false;
+  const expected = crypto
+    .createHmac('sha256', password)
+    .update('admin-session')
+    .digest('hex');
+  return token === expected;
+}
+
+export async function POST(request: Request) {
+  const cookieHeader = request.headers.get('cookie') || '';
+  const tokenMatch = cookieHeader.match(/admin_token=([^;]+)/);
+  const token = tokenMatch ? tokenMatch[1] : '';
+
+  if (!verifyToken(token)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { title, content } = await request.json();
+
+  if (!title?.trim() || !content?.trim()) {
+    return NextResponse.json({ error: '제목과 내용을 입력해주세요.' }, { status: 400 });
+  }
+
+  const date = new Date().toISOString().slice(0, 10);
+  const safeTitle = title.trim().replace(/[^\w가-힣\s-]/g, '').replace(/\s+/g, '-');
+  const slug = `${date}-${safeTitle}-${Date.now()}`;
+
+  const post = { slug, title: title.trim(), date, content: content.trim() };
+
+  await redis.set(`kv:post:${slug}`, JSON.stringify(post));
+  await redis.zadd('kv:posts', { score: Date.now(), member: slug });
+
+  return NextResponse.json({ ok: true, slug });
+}

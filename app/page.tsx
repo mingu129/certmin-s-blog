@@ -2,8 +2,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getAllPosts } from '@/lib/posts';
 
-export default function Home() {
-  const latestPosts = getAllPosts().slice(0, 5);
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const latestPosts = (await getAllPosts()).slice(0, 5);
 
   return (
     <main className="blog-container">
@@ -42,10 +44,8 @@ export default function Home() {
         {/* ── 사이드바 ── */}
         <div className="side-col">
 
-          {/* 춤추는 아기 */}
           <div className="sidebar-block">
             <div className="sidebar-block-content" style={{ textAlign: 'center' }}>
-              {/* /public/dancing-baby.gif 파일을 넣어주세요 */}
               <img
                 src="/dancing-baby.gif"
                 alt="dancing baby"
@@ -54,7 +54,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 소개 */}
           <div className="sidebar-block">
             <div className="sidebar-block-title">소개</div>
             <div className="sidebar-block-content">
@@ -65,7 +64,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 이미지 */}
           <div className="sidebar-block">
             <div className="sidebar-block-content" style={{ textAlign: 'center' }}>
               <Image

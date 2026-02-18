@@ -49,8 +49,7 @@ export async function POST(request: Request) {
     }
 
     const date = new Date().toISOString().slice(0, 10);
-    const safeTitle = title.trim().replace(/[^\w가-힣\s-]/g, '').replace(/\s+/g, '-');
-    const slug = `${date}-${safeTitle}-${Date.now()}`;
+    const slug = `${date}-${Date.now()}`;
 
     const post = { slug, title: title.trim(), date, content: content.trim() };
 

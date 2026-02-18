@@ -14,6 +14,22 @@ export default async function Home() {
 
         {/* ── 메인 ── */}
         <div className="main-col">
+          <div style={{ marginBottom: '28px' }}>
+            <Image
+              src="/pilsung.png"
+              alt="pilsung"
+              width={600}
+              height={124}
+              priority
+              style={{
+                width: '100%',
+                height: 'auto',
+                borderRadius: '4px',
+                display: 'block',
+              }}
+            />
+          </div>
+
           <div style={{ marginBottom: '24px' }}>
             <span className="section-heading">최근 글</span>
           </div>
@@ -58,19 +74,6 @@ export default async function Home() {
                 <div>이름: 윤민규</div>
                 <div>취미: 코딩, 블로그</div>
               </div>
-            </div>
-          </div>
-
-          <div className="sidebar-block">
-            <div className="sidebar-block-content" style={{ textAlign: 'center' }}>
-              <Image
-                src="/pilsung.png"
-                alt="pilsung"
-                width={300}
-                height={62}
-                priority
-                style={{ width: '100%', height: 'auto' }}
-              />
             </div>
           </div>
 

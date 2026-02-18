@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAllPosts } from '@/lib/posts';
+import DancingBaby from './components/DancingBaby';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,11 +47,7 @@ export default async function Home() {
 
           <div className="sidebar-block">
             <div className="sidebar-block-content" style={{ textAlign: 'center' }}>
-              <img
-                src="/dancing-baby.gif"
-                alt="dancing baby"
-                style={{ maxWidth: '100%', imageRendering: 'pixelated' }}
-              />
+              <DancingBaby />
             </div>
           </div>
 

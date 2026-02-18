@@ -36,7 +36,7 @@ function getFilePosts(): PostData[] {
 
 async function getKVPosts(): Promise<PostData[]> {
   try {
-    const slugs = await redis.zrange('kv:posts', 0, -1, { rev: true });
+    const slugs = await redis.zrevrange('kv:posts', 0, -1);
     if (!slugs || slugs.length === 0) return [];
 
     const posts = await Promise.all(

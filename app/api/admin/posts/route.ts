@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     const post = { slug, title: title.trim(), date, content: content.trim() };
 
     await redis.set(`kv:post:${slug}`, JSON.stringify(post));
-    await redis.zadd('kv:posts', { score: Date.now(), member: slug });
+    await redis.zadd('kv:posts', Date.now(), slug);
 
     return NextResponse.json({ ok: true, slug });
   } catch (err) {

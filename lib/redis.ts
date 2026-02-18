@@ -1,6 +1,10 @@
-import { Redis } from '@upstash/redis';
+import Redis from 'ioredis';
 
-export const redis = new Redis({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!,
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+  maxRetriesPerRequest: 3,
+  connectTimeout: 10000,
+  lazyConnect: true,
+  enableOfflineQueue: false,
 });
+
+export { redis };

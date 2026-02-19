@@ -269,16 +269,16 @@ graph TB
         subgraph Pages["페이지 컴포넌트"]
             Home[app/page.tsx\n홈페이지]
             BlogList[app/blog/page.tsx\n글 목록]
-            BlogPost[app/blog/[slug]/page.tsx\n글 상세]
+            BlogPost["app/blog/[slug]/page.tsx\n글 상세"]
             AdminLogin[app/admin/page.tsx\n관리자 로그인]
             AdminWrite[app/admin/write/page.tsx\n글 관리]
-            AdminEdit[app/admin/edit/[slug]/page.tsx\n글 수정]
+            AdminEdit["app/admin/edit/[slug]/page.tsx\n글 수정"]
         end
 
         subgraph API["API 라우트 (백엔드)"]
             LoginAPI[api/admin/login/route.ts\nPOST: 로그인\nDELETE: 로그아웃]
             PostsAPI[api/admin/posts/route.ts\nGET: 목록\nPOST: 글 생성]
-            PostSlugAPI[api/admin/posts/[slug]/route.ts\nGET/PUT/DELETE]
+            PostSlugAPI["api/admin/posts/[slug]/route.ts\nGET/PUT/DELETE"]
         end
 
         subgraph Lib["공유 라이브러리"]

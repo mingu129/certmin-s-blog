@@ -257,134 +257,176 @@ certmin-s-blog/
 
 ### 5-1. 전체 시스템 구조
 
-```mermaid
-graph TB
-    subgraph Browser["브라우저 (사용자 화면)"]
-        User[사용자]
-    end
-
-    subgraph NextJS["Next.js 앱 서버"]
-        Middleware[proxy.ts\n미들웨어\n인증 게이트웨이]
-
-        subgraph Pages["페이지 컴포넌트"]
-            Home[app/page.tsx\n홈페이지]
-            BlogList[app/blog/page.tsx\n글 목록]
-            BlogPost["app/blog/[slug]/page.tsx\n글 상세"]
-            AdminLogin[app/admin/page.tsx\n관리자 로그인]
-            AdminWrite[app/admin/write/page.tsx\n글 관리]
-            AdminEdit["app/admin/edit/[slug]/page.tsx\n글 수정"]
-        end
-
-        subgraph API["API 라우트 (백엔드)"]
-            LoginAPI[api/admin/login/route.ts\nPOST: 로그인\nDELETE: 로그아웃]
-            PostsAPI[api/admin/posts/route.ts\nGET: 목록\nPOST: 글 생성]
-            PostSlugAPI["api/admin/posts/[slug]/route.ts\nGET/PUT/DELETE"]
-        end
-
-        subgraph Lib["공유 라이브러리"]
-            PostsLib[lib/posts.ts\ngetAllPosts\ngetPostBySlug]
-            RedisClient[lib/redis.ts\nRedis 연결 관리]
-        end
-
-        subgraph Components["UI 컴포넌트"]
-            Layout[app/layout.tsx\n공통 레이아웃]
-            DancingBaby[DancingBaby.tsx\n더블클릭→/admin]
-            MarqueeBar[MarqueeBar.tsx\n흐르는 텍스트]
-            CursorTrail[CursorTrail.tsx\n마우스 효과]
-        end
-    end
-
-    subgraph Data["데이터 저장소"]
-        Redis[(Redis\n데이터베이스)]
-    end
-
-    User -->|HTTP 요청| Middleware
-    Middleware -->|/admin/* 인증 검사| Pages
-    Middleware -->|통과| Pages
-
-    Home -->|getAllPosts| PostsLib
-    BlogList -->|getAllPosts| PostsLib
-    BlogPost -->|getPostBySlug| PostsLib
-    PostsLib -->|redis.get/zrevrange| RedisClient
-    RedisClient -->|연결| Redis
-
-    AdminWrite -->|fetch API| PostsAPI
-    AdminEdit -->|fetch API| PostSlugAPI
-    AdminLogin -->|fetch API| LoginAPI
-
-    PostsAPI -->|redis.set/zadd| RedisClient
-    PostSlugAPI -->|redis.get/set/del| RedisClient
-    LoginAPI -->|쿠키 설정| Browser
-
-    Layout -->|감싸기| Pages
-    Home -->|사용| DancingBaby
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        브라우저 (사용자 화면)                             │
+│                               [사용자]                                   │
+└───────────────────────────────────┬─────────────────────────────────────┘
+                                    │ HTTP 요청
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           Next.js 앱 서버                                │
+│                                                                         │
+│         [proxy.ts 미들웨어 — 인증 게이트웨이]                             │
+│          /admin/* 인증 검사 ──────────────────── 그 외 경로: 그냥 통과    │
+│                 │                                                        │
+│                 ▼                                                        │
+│  ┌──────────────────────────┐   ┌──────────────────────────────────┐    │
+│  │      페이지 컴포넌트      │   │       API 라우트 (백엔드)          │    │
+│  │                          │   │                                  │    │
+│  │  app/page.tsx   (홈)     │   │  api/admin/login/route.ts        │    │
+│  │  app/blog/page.tsx       │   │    POST: 로그인                  │    │
+│  │  app/blog/[slug]/page.tsx│   │    DELETE: 로그아웃               │    │
+│  │  app/admin/page.tsx      │   │                                  │    │
+│  │  app/admin/write/page.tsx│   │  api/admin/posts/route.ts        │    │
+│  │  app/admin/edit/[slug]/  │   │    GET: 목록 / POST: 글 생성     │    │
+│  │            page.tsx      │   │                                  │    │
+│  └──────────┬───────────────┘   │  api/admin/posts/[slug]/route.ts │    │
+│             │ getAllPosts        │    GET / PUT / DELETE            │    │
+│             │ getPostBySlug     └────────────────┬─────────────────┘    │
+│             │                                    │ redis.set/zadd       │
+│             │                                    │ redis.get/set/del    │
+│             └──────────────────┬─────────────────┘                      │
+│                                ▼                                         │
+│              ┌─────────────────────────────────┐                        │
+│              │          공유 라이브러리          │                        │
+│              │  lib/posts.ts                   │                        │
+│              │    getAllPosts() / getPostBySlug()                        │
+│              │  lib/redis.ts  (Redis 연결 관리) │                        │
+│              └─────────────────┬───────────────┘                        │
+│                                │ redis.get / zrevrange                  │
+│  ┌──────────────────────────┐  │                                        │
+│  │       UI 컴포넌트         │  │                                        │
+│  │  app/layout.tsx (공통 틀) │  │                                        │
+│  │  DancingBaby.tsx          │  │                                        │
+│  │  MarqueeBar.tsx           │  │                                        │
+│  │  CursorTrail.tsx          │  │                                        │
+│  └──────────────────────────┘  │                                        │
+└────────────────────────────────┼────────────────────────────────────────┘
+                                 │ 연결
+                                 ▼
+                    ┌────────────────────────┐
+                    │    Redis 데이터베이스   │
+                    └────────────────────────┘
 ```
 
 ### 5-2. 페이지별 렌더링 방식
 
-```mermaid
-graph LR
-    subgraph Server["서버 컴포넌트\n(서버에서 HTML 생성)"]
-        SC1[app/page.tsx\n홈]
-        SC2[app/blog/page.tsx\n글 목록]
-        SC3[app/blog/slug/page.tsx\n글 상세]
-    end
+```
+ 서버 컴포넌트 ('use client' 없음 → 자동 적용)
+┌──────────────────────────────────────────────┐
+│  app/page.tsx              (홈)              │
+│  app/blog/page.tsx         (글 목록)         │
+│  app/blog/[slug]/page.tsx  (글 상세)         │
+│                                              │
+│  → 서버에서 HTML 완성 후 전달                 │
+│  → DB 직접 접근 가능                         │
+│  → 빠른 초기 로드 / SEO 유리                 │
+│  → 이벤트 핸들러(onClick 등) 사용 불가       │
+└──────────────────────────────────────────────┘
 
-    subgraph Client["클라이언트 컴포넌트\n(브라우저에서 실행)"]
-        CC1[app/admin/page.tsx\n로그인 폼]
-        CC2[app/admin/write/page.tsx\n글 관리]
-        CC3[app/admin/edit/slug/page.tsx\n글 수정]
-        CC4[DancingBaby.tsx]
-        CC5[MarqueeBar.tsx]
-        CC6[CursorTrail.tsx]
-    end
-
-    Server -->|"'use client' 없음\n→ 자동으로 서버 컴포넌트"| Note1[빠른 초기 로드\nSEO 유리]
-    Client -->|"'use client' 선언\n→ 클라이언트 컴포넌트"| Note2[상태관리 가능\n이벤트 처리 가능]
+ 클라이언트 컴포넌트 ('use client' 선언 → 명시 적용)
+┌──────────────────────────────────────────────┐
+│  app/admin/page.tsx              (로그인 폼) │
+│  app/admin/write/page.tsx        (글 관리)   │
+│  app/admin/edit/[slug]/page.tsx  (글 수정)   │
+│  DancingBaby.tsx / MarqueeBar.tsx            │
+│  CursorTrail.tsx                             │
+│                                              │
+│  → 브라우저에서 실행                          │
+│  → useState · useEffect 사용 가능            │
+│  → 이벤트 처리 가능                           │
+│  → DB 직접 접근 불가 (API 경유 필요)          │
+└──────────────────────────────────────────────┘
 ```
 
 ### 5-3. Redis 데이터 접근 패턴
 
-```mermaid
-sequenceDiagram
-    participant Page as 페이지/API
-    participant Lib as lib/posts.ts
-    participant RC as lib/redis.ts
-    participant R as Redis DB
+```
+━━━ 글 목록 조회 흐름 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-    Note over Page,R: 글 목록 조회
-    Page->>Lib: getAllPosts()
-    Lib->>RC: redis.zrevrange("kv:posts", 0, -1)
-    RC->>R: ZREVRANGE kv:posts 0 -1
-    R-->>RC: ["slug3", "slug2", "slug1"]
-    RC-->>Lib: slug 배열
-    Lib->>RC: redis.get("kv:post:slug3") × N번
-    RC->>R: GET kv:post:slug3
-    R-->>RC: '{"slug":"...","title":"...",...}'
-    RC-->>Lib: JSON 문자열
-    Lib-->>Page: PostData[] 배열
+  페이지/API        lib/posts.ts      lib/redis.ts       Redis DB
+      │                  │                 │                  │
+      │  getAllPosts()    │                 │                  │
+      │─────────────────▶│                 │                  │
+      │                  │  zrevrange(     │                  │
+      │                  │  "kv:posts",0,-1│                  │
+      │                  │────────────────▶│                  │
+      │                  │                 │ ZREVRANGE        │
+      │                  │                 │  kv:posts 0 -1  │
+      │                  │                 │─────────────────▶│
+      │                  │                 │  ["slug3","slug2"]│
+      │                  │                 │◀─────────────────│
+      │                  │   slug 배열     │                  │
+      │                  │◀────────────────│                  │
+      │                  │  get("kv:post:slug3") × N번        │
+      │                  │────────────────▶│                  │
+      │                  │                 │ GET kv:post:slug3│
+      │                  │                 │─────────────────▶│
+      │                  │                 │ '{"title":"..."}' │
+      │                  │                 │◀─────────────────│
+      │                  │   JSON 문자열   │                  │
+      │                  │◀────────────────│                  │
+      │  PostData[] 배열 │                 │                  │
+      │◀─────────────────│                 │                  │
 
-    Note over Page,R: 새 글 저장
-    Page->>RC: redis.set("kv:post:{slug}", JSON)
-    RC->>R: SET kv:post:slug {"slug":...}
-    Page->>RC: redis.zadd("kv:posts", timestamp, slug)
-    RC->>R: ZADD kv:posts 1705734000000 slug
-    R-->>RC: OK
+━━━ 새 글 저장 흐름 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  페이지/API        lib/posts.ts      lib/redis.ts       Redis DB
+      │                  │                 │                  │
+      │  set("kv:post:{slug}", JSON)       │                  │
+      │───────────────────────────────────▶│                  │
+      │                  │                 │ SET kv:post:slug │
+      │                  │                 │─────────────────▶│
+      │  zadd("kv:posts", timestamp, slug) │                  │
+      │───────────────────────────────────▶│                  │
+      │                  │                 │ ZADD kv:posts ...│
+      │                  │                 │─────────────────▶│
+      │                  │                 │       OK         │
+      │                  │                 │◀─────────────────│
 ```
 
 ### 5-4. 인증 토큰 생성 방식
 
-```mermaid
-flowchart TD
-    A[관리자가 비밀번호 입력] --> B["HMAC-SHA256 계산\ncrypto.createHmac('sha256', password)\n  .update('admin-session')\n  .digest('hex')"]
-    B --> C["토큰 = 64자리 16진수 문자열\n예: 'a3f8b2c1...'"]
-    C --> D["httpOnly 쿠키로 저장\nadmin_token=a3f8b2c1...\n(7일 유효, JS에서 접근 불가)"]
+```
+━━━ 토큰 생성 (로그인 시) ━━━━━━━━━━━━━━━━━━━━━━━━━
 
-    E[다음 요청 시] --> F["쿠키에서 admin_token 읽기"]
-    F --> G["같은 방식으로 토큰 재계산"]
-    G --> H{저장된 토큰 == 재계산 토큰?}
-    H -->|Yes| I[인증 통과]
-    H -->|No| J["/admin으로 리다이렉트"]
+  관리자가 비밀번호 입력
+           │
+           ▼
+  HMAC-SHA256 계산
+  crypto.createHmac('sha256', password)
+    .update('admin-session')
+    .digest('hex')
+           │
+           ▼
+  토큰 = 64자리 16진수 문자열
+  예: "a3f8b2c1d4e5f6..."
+           │
+           ▼
+  httpOnly 쿠키로 저장
+  admin_token=a3f8b2c1...
+  (7일 유효, JS에서 직접 접근 불가)
+
+━━━ 토큰 검증 (이후 요청 시) ━━━━━━━━━━━━━━━━━━━━━━
+
+  다음 요청 도착
+           │
+           ▼
+  쿠키에서 admin_token 읽기
+           │
+           ▼
+  같은 방식으로 토큰 재계산
+  (HMAC-SHA256 + 환경변수 비밀번호)
+           │
+           ▼
+  저장된 토큰 == 재계산 토큰?
+           │
+     ┌─────┴─────┐
+    YES          NO
+     │            │
+     ▼            ▼
+  인증 통과    /admin으로 리다이렉트
 ```
 
 ---
@@ -511,32 +553,45 @@ export const dynamic = 'force-dynamic';
 
 ## 7. 인증(로그인) 흐름
 
-```mermaid
-sequenceDiagram
-    actor Admin as 관리자
-    participant Browser as 브라우저
-    participant Middleware as proxy.ts
-    participant LoginAPI as /api/admin/login
-    participant PostsAPI as /api/admin/posts
-
-    Admin->>Browser: /admin 접속
-    Browser->>Middleware: GET /admin
-    Note over Middleware: /admin 경로 자체는\n보호 안 함 (로그인 페이지)
-    Middleware->>Browser: 로그인 페이지 표시
-
-    Admin->>Browser: 비밀번호 입력 후 제출
-    Browser->>LoginAPI: POST /api/admin/login\n{ password: "..." }
-    LoginAPI->>LoginAPI: 비밀번호 검증
-    LoginAPI-->>Browser: 성공 시 admin_token 쿠키 설정\n(httpOnly, 7일)
-    Browser->>Browser: /admin/write 로 이동
-
-    Admin->>Browser: 글 작성 후 발행
-    Browser->>Middleware: POST /api/admin/posts\n쿠키: admin_token=abc123
-    Middleware->>Middleware: 토큰 검증 (HMAC 재계산)
-    Middleware-->>Browser: 토큰 무효시 /admin 리다이렉트
-    Middleware->>PostsAPI: 토큰 유효시 통과
-    PostsAPI->>PostsAPI: 토큰 재검증 (이중 검증)
-    PostsAPI-->>Browser: 글 저장 완료 응답
+```
+  관리자        브라우저         proxy.ts      /api/admin    /api/admin
+                               미들웨어         /login         /posts
+    │               │               │               │               │
+    │  /admin 접속  │               │               │               │
+    │──────────────▶│               │               │               │
+    │               │  GET /admin   │               │               │
+    │               │──────────────▶│               │               │
+    │               │  (/admin 자체는 보호 안 함 — 로그인 페이지)    │
+    │               │  로그인 페이지│               │               │
+    │               │◀──────────────│               │               │
+    │               │               │               │               │
+    │ 비밀번호 입력 │               │               │               │
+    │──────────────▶│               │               │               │
+    │               │    POST /api/admin/login       │               │
+    │               │    { password: "..." }         │               │
+    │               │───────────────────────────────▶│               │
+    │               │               │         비밀번호 검증          │
+    │               │               │               │               │
+    │               │  성공: admin_token 쿠키 설정 (httpOnly, 7일)   │
+    │               │◀───────────────────────────────│               │
+    │               │  /admin/write 로 이동           │               │
+    │               │               │               │               │
+    │ 글 작성 후 발행│               │               │               │
+    │──────────────▶│               │               │               │
+    │               │  POST /api/admin/posts         │               │
+    │               │  쿠키: admin_token=abc123      │               │
+    │               │──────────────▶│               │               │
+    │               │               │ 토큰 검증      │               │
+    │               │               │ (HMAC 재계산)  │               │
+    │               │  토큰 무효 →  │               │               │
+    │               │  /admin 리다이렉트              │               │
+    │               │◀ ─ ─ ─ ─ ─ ─ │               │               │
+    │               │  토큰 유효 → 통과              │               │
+    │               │               │───────────────────────────────▶│
+    │               │               │               │  토큰 재검증   │
+    │               │               │               │  (이중 검증)   │
+    │               │  글 저장 완료 응답              │               │
+    │               │◀───────────────────────────────────────────────│
 ```
 
 ---

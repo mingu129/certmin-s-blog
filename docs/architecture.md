@@ -1,0 +1,741 @@
+# 아키텍처 문서 — 윤민규의 블로그
+
+> 웹 개발 초보자도 이해할 수 있도록 작성된 프로젝트 구조 설명서입니다.
+> 전문 용어는 옆에 쉬운 말로 함께 설명합니다.
+
+---
+
+## 목차
+
+1. [프로젝트 개요](#1-프로젝트-개요)
+2. [기술 스택](#2-기술-스택)
+3. [폴더·파일 구조](#3-폴더파일-구조)
+4. [데이터 흐름](#4-데이터-흐름)
+5. [주요 컴포넌트·모듈 관계도](#5-주요-컴포넌트모듈-관계도)
+6. [핵심 개념 설명](#6-핵심-개념-설명)
+7. [인증(로그인) 흐름](#7-인증로그인-흐름)
+8. [데이터베이스 구조](#8-데이터베이스-구조)
+9. [URL 구조 (라우팅)](#9-url-구조-라우팅)
+10. [환경 변수 설정](#10-환경-변수-설정)
+
+---
+
+## 1. 프로젝트 개요
+
+이 프로젝트는 **개인 블로그 웹사이트**입니다. 글을 쓰고, 읽고, 수정하고, 삭제할 수 있는 CMS(Content Management System — 콘텐츠 관리 시스템)가 내장되어 있습니다.
+
+### 주요 기능
+
+| 기능 | 설명 |
+|------|------|
+| 블로그 홈 | 최신 글 5개를 보여주는 메인 페이지 |
+| 글 목록 | 전체 글을 날짜 역순으로 나열 |
+| 글 상세 | 마크다운으로 작성된 글을 렌더링해서 표시 |
+| 관리자 로그인 | 비밀번호로 관리자 인증 |
+| 글 쓰기 | 관리자가 새 글 작성·발행 |
+| 글 수정 | 기존 글 내용 편집 |
+| 글 삭제 | 글 삭제 |
+
+### 특이한 점 (숨겨진 기능)
+
+- 사이드바의 **"춤추는 아기" GIF를 더블클릭**하면 `/admin`(관리자 로그인 페이지)으로 이동합니다. 관리자 페이지 URL을 직접 공개하지 않는 방식입니다.
+- 레트로(복고풍) 디자인 — 1990년대 개인 홈페이지 감성의 픽셀 폰트와 어두운 테마를 사용합니다.
+
+---
+
+## 2. 기술 스택
+
+> **기술 스택(Tech Stack)**: 이 프로젝트를 만드는 데 사용된 기술들의 목록
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   사용자 브라우저                    │
+│           (Chrome, Firefox, Safari 등)               │
+└──────────────────────┬──────────────────────────────┘
+                       │ HTTP 요청
+┌──────────────────────▼──────────────────────────────┐
+│               Next.js 16 (앱 서버)                  │
+│  ┌──────────────────────────────────────────────┐   │
+│  │  React 19 (화면 구성)                        │   │
+│  │  TypeScript 5 (타입 안전성)                  │   │
+│  │  Tailwind CSS v4 + 커스텀 CSS (스타일)       │   │
+│  └──────────────────────────────────────────────┘   │
+└──────────────────────┬──────────────────────────────┘
+                       │ 데이터 읽기/쓰기
+┌──────────────────────▼──────────────────────────────┐
+│               Redis (데이터베이스)                   │
+│         ioredis 5 라이브러리를 통해 접속             │
+└─────────────────────────────────────────────────────┘
+```
+
+### 기술별 역할 설명
+
+| 기술 | 버전 | 역할 | 쉬운 설명 |
+|------|------|------|-----------|
+| **Next.js** | 16.1.1 | 풀스택 웹 프레임워크 | React로 만든 앱을 서버에서도 실행할 수 있게 해주는 틀 |
+| **React** | 19.2.3 | UI 라이브러리 | 화면을 컴포넌트(부품) 단위로 만드는 도구 |
+| **TypeScript** | 5.x | 프로그래밍 언어 | JavaScript에 타입(자료형) 검사를 추가한 언어 |
+| **Tailwind CSS** | 4.x | CSS 프레임워크 | 미리 만들어진 CSS 클래스를 조합해 스타일을 적용 |
+| **Redis** | - | 데이터베이스 | 데이터를 메모리에 저장하는 초고속 저장소 |
+| **ioredis** | 5.9.3 | Redis 클라이언트 | Node.js에서 Redis에 접속하기 위한 라이브러리 |
+| **react-markdown** | 10.x | 마크다운 렌더러 | `**굵게**` 같은 마크다운 문법을 HTML로 변환 |
+| **gray-matter** | 4.x | 마크다운 파서 | 마크다운 파일의 메타데이터(제목, 날짜 등)를 파싱 |
+| **xp.css** | 0.2.6 | CSS 라이브러리 | Windows XP 스타일의 UI 컴포넌트 (현재 미사용으로 추정) |
+| **DungGeunMo 폰트** | - | 웹폰트 | 한국어 도트(픽셀) 스타일 폰트 |
+
+---
+
+## 3. 폴더·파일 구조
+
+```
+certmin-s-blog/
+│
+├── app/                          ← Next.js App Router 루트 폴더
+│   │                               (여기 있는 파일들이 웹페이지가 됨)
+│   │
+│   ├── layout.tsx                ← 모든 페이지에 공통으로 적용되는 틀
+│   │                               (헤더, 네비게이션, 푸터 포함)
+│   │
+│   ├── page.tsx                  ← 홈 페이지 (/ 경로)
+│   ├── globals.css               ← 전체 사이트에 적용되는 CSS 스타일
+│   ├── favicon.ico               ← 브라우저 탭에 표시되는 아이콘
+│   │
+│   ├── blog/                     ← 블로그 관련 페이지들
+│   │   ├── page.tsx              ← 글 목록 페이지 (/blog)
+│   │   └── [slug]/               ← 동적 라우트 (각 글의 URL)
+│   │       └── page.tsx          ← 글 상세 페이지 (/blog/어떤글-슬러그)
+│   │
+│   ├── admin/                    ← 관리자 전용 페이지들
+│   │   ├── page.tsx              ← 관리자 로그인 페이지 (/admin)
+│   │   ├── write/
+│   │   │   └── page.tsx          ← 글 목록·쓰기 관리 페이지 (/admin/write)
+│   │   └── edit/
+│   │       └── [slug]/
+│   │           └── page.tsx      ← 글 수정 페이지 (/admin/edit/슬러그)
+│   │
+│   ├── api/                      ← API 엔드포인트 (백엔드 역할)
+│   │   └── admin/
+│   │       ├── login/
+│   │       │   └── route.ts      ← 로그인·로그아웃 API
+│   │       │                       POST: 로그인 | DELETE: 로그아웃
+│   │       └── posts/
+│   │           ├── route.ts      ← 글 목록·생성 API
+│   │           │                   GET: 전체 목록 | POST: 새 글 작성
+│   │           └── [slug]/
+│   │               └── route.ts  ← 특정 글 API
+│   │                               GET: 조회 | PUT: 수정 | DELETE: 삭제
+│   │
+│   └── components/               ← 재사용 가능한 UI 부품들
+│       ├── DancingBaby.tsx        ← 춤추는 아기 GIF 컴포넌트
+│       │                            더블클릭 → /admin 이동
+│       ├── MarqueeBar.tsx         ← 상단에 흐르는 텍스트 배너
+│       └── CursorTrail.tsx        ← 마우스 움직일 때 별 효과 생성
+│
+├── lib/                          ← 공유 비즈니스 로직 (순수 함수들)
+│   ├── posts.ts                  ← 글 데이터를 Redis에서 읽어오는 함수들
+│   └── redis.ts                  ← Redis 연결 클라이언트 (싱글톤)
+│
+├── proxy.ts                      ← Next.js 미들웨어
+│                                    /admin/* 접근 시 로그인 여부 검사
+│
+├── public/                       ← 정적 파일 (누구나 직접 접근 가능)
+│   ├── dancing-baby.gif          ← 춤추는 아기 애니메이션 이미지
+│   ├── pilsung.png               ← 홈 상단 "필승" 배너 이미지
+│   └── fonts/
+│       ├── DungGeunMo.woff       ← 한국어 픽셀 폰트
+│       └── DungGeunMo.woff2      ← 최적화된 폰트 형식
+│
+├── next.config.ts                ← Next.js 설정 파일
+├── tsconfig.json                 ← TypeScript 컴파일러 설정
+├── postcss.config.mjs            ← PostCSS(Tailwind CSS 처리) 설정
+├── eslint.config.mjs             ← 코드 스타일 검사 도구 설정
+└── package.json                  ← 프로젝트 정보 및 의존성 목록
+```
+
+---
+
+## 4. 데이터 흐름
+
+> **데이터 흐름**: 사용자가 어떤 행동을 했을 때, 정보가 어떤 경로로 처리되는지를 보여줍니다.
+
+### 4-1. 블로그 글 읽기 (일반 방문자)
+
+```
+사용자가 /blog/2026-01-01-123456 주소로 접속
+         │
+         ▼
+[proxy.ts 미들웨어]
+  → /blog/* 는 인증 검사 없이 통과
+         │
+         ▼
+[app/blog/[slug]/page.tsx]  ← 서버 컴포넌트 (서버에서 실행)
+  → getPostBySlug("2026-01-01-123456") 호출
+         │
+         ▼
+[lib/posts.ts :: getPostBySlug()]
+  → redis.get("kv:post:2026-01-01-123456") 실행
+         │
+         ▼
+[Redis 데이터베이스]
+  → JSON 문자열 반환: {"slug":"...","title":"...","content":"..."}
+         │
+         ▼
+[lib/posts.ts]
+  → JSON.parse() 로 객체로 변환 후 반환
+         │
+         ▼
+[app/blog/[slug]/page.tsx]
+  → ReactMarkdown으로 마크다운 → HTML 변환
+  → 화면 렌더링
+         │
+         ▼
+사용자 브라우저에 완성된 HTML 전달
+```
+
+### 4-2. 관리자가 새 글 작성
+
+```
+관리자가 /admin/write 에서 글 작성 후 "글 발행" 버튼 클릭
+         │
+         ▼
+[app/admin/write/page.tsx]  ← 클라이언트 컴포넌트
+  → fetch("POST /api/admin/posts", { title, content }) 호출
+         │
+         ▼
+[proxy.ts 미들웨어]
+  → /admin/* 경로 → 쿠키에서 admin_token 추출
+  → HMAC-SHA256으로 토큰 검증
+  → 유효하면 통과, 무효하면 /admin으로 리다이렉트
+         │ (통과)
+         ▼
+[app/api/admin/posts/route.ts :: POST]
+  1. 쿠키에서 토큰 재검증
+  2. title, content 유효성 검사
+  3. slug 생성: "2026-01-20-1705734000000"
+  4. post 객체 구성: { slug, title, date, content }
+  5. redis.set("kv:post:{slug}", JSON.stringify(post))
+  6. redis.zadd("kv:posts", timestamp, slug)  ← 목록에 추가
+         │
+         ▼
+[Redis]
+  → 데이터 저장 완료
+         │
+         ▼
+[route.ts]
+  → { ok: true, slug } 응답 반환
+         │
+         ▼
+[app/admin/write/page.tsx]
+  → router.push("/blog/{slug}") 로 작성된 글 페이지로 이동
+```
+
+### 4-3. 로그인 흐름
+
+```
+관리자가 /admin 에서 비밀번호 입력 후 로그인 버튼 클릭
+         │
+         ▼
+[app/admin/page.tsx]
+  → fetch("POST /api/admin/login", { password }) 호출
+         │
+         ▼
+[app/api/admin/login/route.ts :: POST]
+  → 입력된 비밀번호 == 환경변수 ADMIN_PASSWORD 비교
+  → 일치하면:
+      token = HMAC-SHA256(password, "admin-session")
+      쿠키 "admin_token" = token 설정 (7일 유효, httpOnly)
+  → 불일치하면: 401 오류 반환
+         │ (성공)
+         ▼
+[app/admin/page.tsx]
+  → router.push("/admin/write") 로 관리자 대시보드 이동
+```
+
+---
+
+## 5. 주요 컴포넌트·모듈 관계도
+
+### 5-1. 전체 시스템 구조
+
+```mermaid
+graph TB
+    subgraph Browser["브라우저 (사용자 화면)"]
+        User[사용자]
+    end
+
+    subgraph NextJS["Next.js 앱 서버"]
+        Middleware[proxy.ts\n미들웨어\n인증 게이트웨이]
+
+        subgraph Pages["페이지 컴포넌트"]
+            Home[app/page.tsx\n홈페이지]
+            BlogList[app/blog/page.tsx\n글 목록]
+            BlogPost[app/blog/[slug]/page.tsx\n글 상세]
+            AdminLogin[app/admin/page.tsx\n관리자 로그인]
+            AdminWrite[app/admin/write/page.tsx\n글 관리]
+            AdminEdit[app/admin/edit/[slug]/page.tsx\n글 수정]
+        end
+
+        subgraph API["API 라우트 (백엔드)"]
+            LoginAPI[api/admin/login/route.ts\nPOST: 로그인\nDELETE: 로그아웃]
+            PostsAPI[api/admin/posts/route.ts\nGET: 목록\nPOST: 글 생성]
+            PostSlugAPI[api/admin/posts/[slug]/route.ts\nGET/PUT/DELETE]
+        end
+
+        subgraph Lib["공유 라이브러리"]
+            PostsLib[lib/posts.ts\ngetAllPosts\ngetPostBySlug]
+            RedisClient[lib/redis.ts\nRedis 연결 관리]
+        end
+
+        subgraph Components["UI 컴포넌트"]
+            Layout[app/layout.tsx\n공통 레이아웃]
+            DancingBaby[DancingBaby.tsx\n더블클릭→/admin]
+            MarqueeBar[MarqueeBar.tsx\n흐르는 텍스트]
+            CursorTrail[CursorTrail.tsx\n마우스 효과]
+        end
+    end
+
+    subgraph Data["데이터 저장소"]
+        Redis[(Redis\n데이터베이스)]
+    end
+
+    User -->|HTTP 요청| Middleware
+    Middleware -->|/admin/* 인증 검사| Pages
+    Middleware -->|통과| Pages
+
+    Home -->|getAllPosts| PostsLib
+    BlogList -->|getAllPosts| PostsLib
+    BlogPost -->|getPostBySlug| PostsLib
+    PostsLib -->|redis.get/zrevrange| RedisClient
+    RedisClient -->|연결| Redis
+
+    AdminWrite -->|fetch API| PostsAPI
+    AdminEdit -->|fetch API| PostSlugAPI
+    AdminLogin -->|fetch API| LoginAPI
+
+    PostsAPI -->|redis.set/zadd| RedisClient
+    PostSlugAPI -->|redis.get/set/del| RedisClient
+    LoginAPI -->|쿠키 설정| Browser
+
+    Layout -->|감싸기| Pages
+    Home -->|사용| DancingBaby
+```
+
+### 5-2. 페이지별 렌더링 방식
+
+```mermaid
+graph LR
+    subgraph Server["서버 컴포넌트\n(서버에서 HTML 생성)"]
+        SC1[app/page.tsx\n홈]
+        SC2[app/blog/page.tsx\n글 목록]
+        SC3[app/blog/slug/page.tsx\n글 상세]
+    end
+
+    subgraph Client["클라이언트 컴포넌트\n(브라우저에서 실행)"]
+        CC1[app/admin/page.tsx\n로그인 폼]
+        CC2[app/admin/write/page.tsx\n글 관리]
+        CC3[app/admin/edit/slug/page.tsx\n글 수정]
+        CC4[DancingBaby.tsx]
+        CC5[MarqueeBar.tsx]
+        CC6[CursorTrail.tsx]
+    end
+
+    Server -->|"'use client' 없음\n→ 자동으로 서버 컴포넌트"| Note1[빠른 초기 로드\nSEO 유리]
+    Client -->|"'use client' 선언\n→ 클라이언트 컴포넌트"| Note2[상태관리 가능\n이벤트 처리 가능]
+```
+
+### 5-3. Redis 데이터 접근 패턴
+
+```mermaid
+sequenceDiagram
+    participant Page as 페이지/API
+    participant Lib as lib/posts.ts
+    participant RC as lib/redis.ts
+    participant R as Redis DB
+
+    Note over Page,R: 글 목록 조회
+    Page->>Lib: getAllPosts()
+    Lib->>RC: redis.zrevrange("kv:posts", 0, -1)
+    RC->>R: ZREVRANGE kv:posts 0 -1
+    R-->>RC: ["slug3", "slug2", "slug1"]
+    RC-->>Lib: slug 배열
+    Lib->>RC: redis.get("kv:post:slug3") × N번
+    RC->>R: GET kv:post:slug3
+    R-->>RC: '{"slug":"...","title":"...",...}'
+    RC-->>Lib: JSON 문자열
+    Lib-->>Page: PostData[] 배열
+
+    Note over Page,R: 새 글 저장
+    Page->>RC: redis.set("kv:post:{slug}", JSON)
+    RC->>R: SET kv:post:slug {"slug":...}
+    Page->>RC: redis.zadd("kv:posts", timestamp, slug)
+    RC->>R: ZADD kv:posts 1705734000000 slug
+    R-->>RC: OK
+```
+
+### 5-4. 인증 토큰 생성 방식
+
+```mermaid
+flowchart TD
+    A[관리자가 비밀번호 입력] --> B["HMAC-SHA256 계산\ncrypto.createHmac('sha256', password)\n  .update('admin-session')\n  .digest('hex')"]
+    B --> C["토큰 = 64자리 16진수 문자열\n예: 'a3f8b2c1...'"]
+    C --> D["httpOnly 쿠키로 저장\nadmin_token=a3f8b2c1...\n(7일 유효, JS에서 접근 불가)"]
+
+    E[다음 요청 시] --> F["쿠키에서 admin_token 읽기"]
+    F --> G["같은 방식으로 토큰 재계산"]
+    G --> H{저장된 토큰 == 재계산 토큰?}
+    H -->|Yes| I[인증 통과]
+    H -->|No| J[/admin으로 리다이렉트]
+```
+
+---
+
+## 6. 핵심 개념 설명
+
+### 6-1. Next.js App Router란?
+
+Next.js 13 이후 도입된 새로운 방식입니다. `app/` 폴더 안에 파일을 만들면 자동으로 해당 URL 경로의 페이지가 됩니다.
+
+```
+app/page.tsx          → 주소: /
+app/blog/page.tsx     → 주소: /blog
+app/blog/[slug]/page.tsx  → 주소: /blog/어떤내용도가능
+app/api/admin/login/route.ts → 주소: /api/admin/login (API)
+```
+
+`[slug]`처럼 대괄호로 감싼 폴더는 **동적 라우트(Dynamic Route)**라고 합니다. 어떤 값이든 URL로 들어올 수 있고, 그 값을 코드에서 `params.slug`로 읽습니다.
+
+### 6-2. 서버 컴포넌트 vs 클라이언트 컴포넌트
+
+```
+서버 컴포넌트 (Server Component)
+┌─────────────────────────────────────────────┐
+│ • 파일 맨 위에 'use client'가 없음          │
+│ • 서버에서 실행 → HTML을 만들어 브라우저 전달 │
+│ • 데이터베이스 직접 접근 가능               │
+│ • useState, onClick 등 사용 불가           │
+│ • 예: app/page.tsx, app/blog/page.tsx      │
+└─────────────────────────────────────────────┘
+
+클라이언트 컴포넌트 (Client Component)
+┌─────────────────────────────────────────────┐
+│ • 파일 맨 위에 'use client' 선언            │
+│ • 브라우저에서 실행                         │
+│ • useState, useEffect, onClick 등 사용 가능 │
+│ • 데이터베이스 직접 접근 불가 (API 통해야 함) │
+│ • 예: app/admin/page.tsx, DancingBaby.tsx  │
+└─────────────────────────────────────────────┘
+```
+
+### 6-3. Redis와 KV 저장 구조
+
+Redis는 **Key-Value 데이터베이스**입니다. 사전(Dictionary)처럼 키(Key)로 값(Value)을 저장하고 꺼냅니다.
+
+이 프로젝트는 두 가지 Redis 자료형을 사용합니다:
+
+**① String — 글 본문 저장**
+```
+키:   kv:post:2026-01-20-1705734000000
+값:   {"slug":"2026-01-20-...","title":"첫 번째 글","date":"2026-01-20","content":"## 안녕하세요\n..."}
+```
+
+**② Sorted Set — 글 목록 인덱스 (날짜순 정렬)**
+```
+키:   kv:posts
+값:   점수(타임스탬프) → 멤버(slug)
+      1705734000000  → "2026-01-20-1705734000000"
+      1705820400000  → "2026-01-21-1705820400000"
+```
+
+Sorted Set은 점수 기준으로 자동 정렬됩니다. `ZREVRANGE`(역순 조회)를 쓰면 최신 글 순으로 가져옵니다.
+
+### 6-4. Slug란?
+
+**Slug**는 URL에 사용되는 고유 식별자입니다. 이 프로젝트의 slug는 날짜 + 타임스탬프로 자동 생성됩니다:
+
+```
+형식: YYYY-MM-DD-타임스탬프(밀리초)
+예:   2026-01-20-1705734000000
+
+URL:  /blog/2026-01-20-1705734000000
+Redis키: kv:post:2026-01-20-1705734000000
+```
+
+### 6-5. HMAC-SHA256 인증 토큰
+
+비밀번호를 그대로 저장하거나 전송하지 않고, **단방향 해시**로 변환해서 사용합니다.
+
+```
+입력:  비밀번호 ("my-secret-password")
+과정:  HMAC-SHA256("my-secret-password", "admin-session") 계산
+출력:  "a3f8b2c1d4e5f6..." (64자리 고정 문자열)
+
+특징:
+• 출력값으로 원래 비밀번호를 역산할 수 없음
+• 같은 입력이면 항상 같은 출력값
+• 쿠키에 저장 → 매 요청마다 재계산해서 비교
+```
+
+### 6-6. 미들웨어(proxy.ts)의 역할
+
+미들웨어는 **모든 요청을 가로채서 처리하는 중간 단계**입니다.
+
+```
+사용자 요청
+    │
+    ▼
+[proxy.ts 미들웨어]
+    │
+    ├── /admin/write, /admin/edit/... 접근?
+    │       │
+    │       ├── 쿠키에 유효한 admin_token 있음?
+    │       │   → 예: 다음 단계로 통과
+    │       │   → 아니오: /admin 로그인 페이지로 강제 이동
+    │       │
+    │
+    └── 다른 경로? → 그냥 통과
+```
+
+> **주의**: `proxy.ts`라는 파일명이지만, 실제로는 Next.js **미들웨어** 역할을 합니다. 일반적으로 Next.js 미들웨어 파일은 `middleware.ts`로 이름 짓지만, 이 프로젝트는 `proxy.ts`를 사용하며 `tsconfig.json`이나 설정에서 연결될 것으로 보입니다.
+
+### 6-7. force-dynamic이란?
+
+```typescript
+export const dynamic = 'force-dynamic';
+```
+
+이 코드가 있는 페이지는 **매 요청마다 새로 렌더링**합니다. 없으면 Next.js가 빌드 시 한 번만 HTML을 생성해서 캐시합니다.
+
+블로그 글 목록 페이지에서 이것을 사용하는 이유: 새 글이 올라올 때마다 최신 내용을 보여줘야 하기 때문입니다.
+
+---
+
+## 7. 인증(로그인) 흐름
+
+```mermaid
+sequenceDiagram
+    actor Admin as 관리자
+    participant Browser as 브라우저
+    participant Middleware as proxy.ts
+    participant LoginAPI as /api/admin/login
+    participant PostsAPI as /api/admin/posts
+
+    Admin->>Browser: /admin 접속
+    Browser->>Middleware: GET /admin
+    Note over Middleware: /admin 경로 자체는\n보호 안 함 (로그인 페이지)
+    Middleware->>Browser: 로그인 페이지 표시
+
+    Admin->>Browser: 비밀번호 입력 후 제출
+    Browser->>LoginAPI: POST /api/admin/login\n{ password: "..." }
+    LoginAPI->>LoginAPI: 비밀번호 검증
+    LoginAPI-->>Browser: 성공 시 admin_token 쿠키 설정\n(httpOnly, 7일)
+    Browser->>Browser: /admin/write 로 이동
+
+    Admin->>Browser: 글 작성 후 발행
+    Browser->>Middleware: POST /api/admin/posts\n쿠키: admin_token=abc123
+    Middleware->>Middleware: 토큰 검증 (HMAC 재계산)
+    Middleware-->>Browser: 토큰 무효시 /admin 리다이렉트
+    Middleware->>PostsAPI: 토큰 유효시 통과
+    PostsAPI->>PostsAPI: 토큰 재검증 (이중 검증)
+    PostsAPI-->>Browser: 글 저장 완료 응답
+```
+
+---
+
+## 8. 데이터베이스 구조
+
+Redis에 저장되는 모든 데이터의 구조입니다.
+
+### 저장 키 목록
+
+| 키 패턴 | 자료형 | 내용 |
+|---------|--------|------|
+| `kv:posts` | Sorted Set | 전체 글의 slug 목록 (날짜순 정렬) |
+| `kv:post:{slug}` | String(JSON) | 개별 글 본문과 메타데이터 |
+
+### PostData 객체 구조
+
+```typescript
+interface PostData {
+  slug: string;      // 고유 식별자 (URL에 사용)  예: "2026-01-20-1705734000000"
+  title: string;     // 글 제목                   예: "첫 번째 글"
+  date: string;      // 작성일 (YYYY-MM-DD)        예: "2026-01-20"
+  content: string;   // 마크다운 형식의 본문
+  updatedAt?: string;// 수정일 (선택, YYYY-MM-DD)  예: "2026-01-21"
+}
+```
+
+### 데이터 저장/조회 시각화
+
+```
+Redis 내부 구조
+═══════════════════════════════════════════════════════
+Sorted Set: kv:posts
+┌────────────────────────────────────┬─────────────────┐
+│ Score (타임스탬프)                 │ Member (slug)   │
+├────────────────────────────────────┼─────────────────┤
+│ 1705820400000 (2026-01-21)        │ 2026-01-21-...  │ ← ZREVRANGE 시 먼저 반환
+│ 1705734000000 (2026-01-20)        │ 2026-01-20-...  │
+│ 1705647600000 (2026-01-19)        │ 2026-01-19-...  │
+└────────────────────────────────────┴─────────────────┘
+
+String: kv:post:2026-01-21-1705820400000
+┌────────────────────────────────────────────────────────┐
+│ {                                                      │
+│   "slug": "2026-01-21-1705820400000",                │
+│   "title": "오늘의 일기",                             │
+│   "date": "2026-01-21",                              │
+│   "content": "## 오늘은...\n내용 본문...",           │
+│   "updatedAt": "2026-01-22"                          │
+│ }                                                      │
+└────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 9. URL 구조 (라우팅)
+
+### 공개 페이지
+
+| URL | 파일 | 설명 |
+|-----|------|------|
+| `/` | `app/page.tsx` | 홈페이지 (최신 글 5개 + 사이드바) |
+| `/blog` | `app/blog/page.tsx` | 전체 글 목록 |
+| `/blog/{slug}` | `app/blog/[slug]/page.tsx` | 개별 글 읽기 |
+
+### 관리자 페이지 (로그인 필요)
+
+| URL | 파일 | 설명 |
+|-----|------|------|
+| `/admin` | `app/admin/page.tsx` | 로그인 폼 |
+| `/admin/write` | `app/admin/write/page.tsx` | 글 목록 + 새 글 쓰기 |
+| `/admin/edit/{slug}` | `app/admin/edit/[slug]/page.tsx` | 기존 글 수정 |
+
+### API 엔드포인트 (백엔드)
+
+| Method | URL | 파일 | 역할 |
+|--------|-----|------|------|
+| `POST` | `/api/admin/login` | `login/route.ts` | 로그인 (쿠키 발급) |
+| `DELETE` | `/api/admin/login` | `login/route.ts` | 로그아웃 (쿠키 삭제) |
+| `GET` | `/api/admin/posts` | `posts/route.ts` | 전체 글 목록 (관리자용) |
+| `POST` | `/api/admin/posts` | `posts/route.ts` | 새 글 작성 (인증 필요) |
+| `GET` | `/api/admin/posts/{slug}` | `posts/[slug]/route.ts` | 특정 글 조회 |
+| `PUT` | `/api/admin/posts/{slug}` | `posts/[slug]/route.ts` | 특정 글 수정 (인증 필요) |
+| `DELETE` | `/api/admin/posts/{slug}` | `posts/[slug]/route.ts` | 특정 글 삭제 (인증 필요) |
+
+### 라우팅 흐름도
+
+```
+사용자가 URL 입력
+       │
+       ├── /                → app/page.tsx (홈)
+       │
+       ├── /blog            → app/blog/page.tsx (목록)
+       │
+       ├── /blog/어떤-슬러그  → app/blog/[slug]/page.tsx (글 상세)
+       │
+       ├── /admin           → app/admin/page.tsx (로그인)
+       │
+       ├── /admin/write     → [미들웨어 검사] → app/admin/write/page.tsx
+       │
+       ├── /admin/edit/슬러그 → [미들웨어 검사] → app/admin/edit/[slug]/page.tsx
+       │
+       └── /api/...         → API 라우트 핸들러
+```
+
+---
+
+## 10. 환경 변수 설정
+
+이 프로젝트를 실행하려면 다음 환경 변수가 필요합니다. 보통 `.env.local` 파일에 설정합니다.
+
+```bash
+# .env.local 파일 예시
+
+# Redis 서버 접속 주소
+# 로컬 개발: redis://localhost:6379
+# 클라우드(예: Upstash): redis://default:비밀번호@주소:포트
+REDIS_URL=redis://localhost:6379
+
+# 관리자 로그인 비밀번호
+# 이 값이 없으면 관리자 기능 전체가 비활성화됨
+ADMIN_PASSWORD=your-secret-password-here
+```
+
+> **보안 주의**: `.env.local` 파일은 절대 Git에 올리면 안 됩니다. `.gitignore`에 이미 포함되어 있는지 확인하세요.
+
+### 환경 변수가 코드에서 사용되는 곳
+
+| 변수 | 사용 위치 | 용도 |
+|------|-----------|------|
+| `REDIS_URL` | `lib/redis.ts:3` | Redis 서버 연결 주소 |
+| `ADMIN_PASSWORD` | `api/admin/login/route.ts:14` | 로그인 비밀번호 검증 |
+| `ADMIN_PASSWORD` | `api/admin/posts/route.ts:7` | API 토큰 검증 |
+| `ADMIN_PASSWORD` | `api/admin/posts/[slug]/route.ts:7` | API 토큰 검증 |
+| `ADMIN_PASSWORD` | `proxy.ts:3` | 미들웨어 토큰 검증 |
+| `NODE_ENV` | `api/admin/login/route.ts:23` | 프로덕션 환경에서 secure 쿠키 사용 |
+
+---
+
+## 부록: 개발 명령어
+
+```bash
+# 개발 서버 실행 (코드 수정 시 자동 반영)
+npm run dev
+
+# 프로덕션용 빌드
+npm run build
+
+# 프로덕션 서버 실행 (빌드 후 사용)
+npm run start
+
+# 코드 스타일 검사
+npm run lint
+```
+
+## 부록: 한눈에 보는 전체 아키텍처
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         브라우저                                │
+│  ┌───────────┐  ┌──────────────┐  ┌───────────────────────┐   │
+│  │   홈 (/)  │  │  블로그 목록  │  │    관리자 페이지       │   │
+│  │ 서버 렌더링 │  │  서버 렌더링  │  │   클라이언트 렌더링    │   │
+│  └─────┬─────┘  └──────┬───────┘  └──────────┬────────────┘   │
+└────────┼───────────────┼─────────────────────┼────────────────┘
+         │               │                     │ fetch() API 호출
+         │ 서버에서       │ 서버에서             │
+         │ 직접 DB 접근  │ 직접 DB 접근         │
+         │               │                     ▼
+┌────────▼───────────────▼─────────────────────────────────────┐
+│                    Next.js 서버                               │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ proxy.ts 미들웨어 — /admin/* 인증 게이트                  │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  ┌──────────────────┐    ┌────────────────────────────────┐  │
+│  │  lib/posts.ts    │    │  API 라우트                    │  │
+│  │  getAllPosts()   │    │  /api/admin/login  (인증)      │  │
+│  │  getPostBySlug() │    │  /api/admin/posts  (글 CRUD)   │  │
+│  └────────┬─────────┘    └──────────────┬─────────────────┘  │
+│           │                             │                    │
+│           └──────────────┬──────────────┘                    │
+│                          │                                   │
+│                 ┌────────▼────────┐                          │
+│                 │  lib/redis.ts   │                          │
+│                 │ Redis 연결 관리  │                          │
+│                 └────────┬────────┘                          │
+└──────────────────────────┼────────────────────────────────────┘
+                           │
+                           ▼
+┌──────────────────────────────────────────────────────────────┐
+│                     Redis 데이터베이스                        │
+│                                                              │
+│  kv:posts          → Sorted Set (글 목록, 날짜순)            │
+│  kv:post:{slug}    → String/JSON (글 본문)                   │
+└──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+*이 문서는 코드를 직접 분석해 자동으로 생성되었습니다. 2026-02-19 기준.*

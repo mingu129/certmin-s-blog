@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import MarkdownEditor from '@/components/MarkdownEditor';
 
 export default function AdminEditPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -90,20 +91,7 @@ export default function AdminEditPage({ params }: { params: Promise<{ slug: stri
           />
         </div>
         <div style={{ marginBottom: '16px' }}>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="내용"
-            required
-            rows={20}
-            style={{
-              width: '100%', padding: '12px 14px',
-              background: 'var(--surface)', border: '1px solid var(--border)',
-              borderRadius: '4px', color: 'var(--text)',
-              fontSize: '0.95em', fontFamily: 'inherit',
-              resize: 'vertical', lineHeight: '1.7',
-            }}
-          />
+          <MarkdownEditor value={content} onChange={setContent} />
         </div>
         {error && <div style={{ color: '#e06c75', fontSize: '0.85em', marginBottom: '12px' }}>{error}</div>}
         <button type="submit" disabled={loading} className="btn btn-primary">

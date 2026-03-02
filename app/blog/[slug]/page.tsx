@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getPostBySlug, getAllPosts } from '@/lib/posts';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
+import rehypeHighlight from 'rehype-highlight';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +31,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
         <div className="post-content">
           <ReactMarkdown
+            rehypePlugins={[rehypeHighlight]}
             components={{
               h1: ({ children }) => <h1>{children}</h1>,
               h2: ({ children }) => <h2>{children}</h2>,
@@ -38,7 +40,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               ul: ({ children }) => <ul>{children}</ul>,
               ol: ({ children }) => <ol>{children}</ol>,
               li: ({ children }) => <li>{children}</li>,
-              code: ({ children }) => <code>{children}</code>,
+              code: ({ className, children, ...props }) => (
+                <code className={className} {...props}>{children}</code>
+              ),
               pre: ({ children }) => <pre>{children}</pre>,
               blockquote: ({ children }) => <blockquote>{children}</blockquote>,
               a: ({ href, children }) => <a href={href}>{children}</a>,

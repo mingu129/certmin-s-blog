@@ -8,6 +8,7 @@ const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 interface MarkdownEditorProps {
   value: string;
   onChange: (val: string) => void;
+  height?: number;
 }
 
 async function uploadImage(file: File): Promise<string> {
@@ -19,7 +20,7 @@ async function uploadImage(file: File): Promise<string> {
   return data.url as string;
 }
 
-export default function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
+export default function MarkdownEditor({ value, onChange, height = 600 }: MarkdownEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleImageUpload(file: File) {
@@ -62,7 +63,7 @@ export default function MarkdownEditor({ value, onChange }: MarkdownEditorProps)
       <MDEditor
         value={value}
         onChange={(val) => onChange(val ?? '')}
-        height={480}
+        height={height}
         extraCommands={[
           {
             name: 'upload-image',

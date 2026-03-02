@@ -1,34 +1,18 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import MarkdownEditor from '@/components/MarkdownEditor';
 
-export default function AdminEditPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+export default function AdminWriteNewPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true);
 
-  useEffect(() => {
-    fetch(`/api/admin/posts/${slug}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setTitle(data.title || '');
-        setContent(data.content || '');
-        setFetching(false);
-      })
-      .catch(() => {
-        setError('글을 불러오는데 실패했습니다.');
-        setFetching(false);
-      });
-  }, [slug]);
-
-  async function handleSave() {
+  async function handlePublish() {
     if (!title.trim()) {
       setError('제목을 입력하세요.');
       return;
@@ -38,8 +22,8 @@ export default function AdminEditPage({ params }: { params: Promise<{ slug: stri
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 15000);
-      const res = await fetch(`/api/admin/posts/${slug}`, {
-        method: 'PUT',
+      const res = await fetch('/api/admin/posts', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, content }),
         signal: controller.signal,
@@ -47,7 +31,7 @@ export default function AdminEditPage({ params }: { params: Promise<{ slug: stri
       clearTimeout(timeout);
       const data = await res.json();
       if (res.ok) {
-        router.push(`/blog/${slug}`);
+        router.push(`/blog/${data.slug}`);
       } else {
         setError(data.error || '저장 실패');
         setLoading(false);
@@ -60,14 +44,6 @@ export default function AdminEditPage({ params }: { params: Promise<{ slug: stri
       }
       setLoading(false);
     }
-  }
-
-  if (fetching) {
-    return (
-      <main className="blog-container">
-        <p style={{ color: 'var(--text-muted)' }}>불러오는 중...</p>
-      </main>
-    );
   }
 
   return (
@@ -85,17 +61,17 @@ export default function AdminEditPage({ params }: { params: Promise<{ slug: stri
         padding: '12px 0',
         gap: '12px',
       }}>
-        <Link href="/admin/write" className="btn">← 목록</Link>
+        <Link href="/admin/write" className="btn">← 뒤로</Link>
         {error && (
           <span style={{ color: '#e06c75', fontSize: '0.85em', flex: 1 }}>{error}</span>
         )}
         <button
-          onClick={handleSave}
+          onClick={handlePublish}
           disabled={loading}
           className="btn btn-primary"
           style={{ cursor: 'pointer' }}
         >
-          {loading ? '저장 중...' : '수정 완료'}
+          {loading ? '저장 중...' : '글 발행'}
         </button>
       </div>
 

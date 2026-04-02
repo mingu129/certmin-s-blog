@@ -47,36 +47,98 @@ export default function AdminWriteNewPage() {
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '100vh', padding: '0 24px' }}>
-      {/* Sticky 상단 바 */}
-      <div style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 10,
-        background: 'var(--bg)',
-        borderBottom: '1px solid var(--border)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '12px 0',
-        gap: '12px',
-      }}>
-        <Link href="/admin/write" className="btn">← 뒤로</Link>
+    <div
+      style={{
+        maxWidth: '1280px',
+        margin: '0 auto',
+        minHeight: '100vh',
+        padding: '0 32px',
+      }}
+    >
+      {/* Sticky top bar */}
+      <div
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          background: 'rgba(13, 14, 17, 0.9)',
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(70, 72, 78, 0.15)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '14px 0',
+          gap: '16px',
+        }}
+      >
+        <Link
+          href="/admin/write"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 16px',
+            background: '#1e2024',
+            color: '#a9abb2',
+            fontSize: '0.78em',
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            borderRadius: '0.5rem',
+            textDecoration: 'none',
+            transition: 'background 0.2s',
+          }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_back</span>
+          뒤로
+        </Link>
+
         {error && (
-          <span style={{ color: '#e06c75', fontSize: '0.85em', flex: 1 }}>{error}</span>
+          <span
+            style={{
+              color: '#f97386',
+              fontSize: '0.82em',
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>error</span>
+            {error}
+          </span>
         )}
+
         <button
           onClick={handlePublish}
           disabled={loading}
-          className="btn btn-primary"
-          style={{ cursor: 'pointer' }}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '10px 24px',
+            background: '#5a7af8',
+            color: '#000',
+            border: 'none',
+            borderRadius: '0.5rem',
+            fontSize: '0.82em',
+            fontWeight: 700,
+            fontFamily: 'inherit',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : 1,
+            boxShadow: '0 4px 16px rgba(90,122,248,0.2)',
+            transition: 'filter 0.2s',
+          }}
         >
+          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>publish</span>
           {loading ? '저장 중...' : '글 발행'}
         </button>
       </div>
 
-      {/* 제목 입력 */}
-      <div style={{ padding: '32px 0 16px' }}>
+      {/* Title input */}
+      <div style={{ padding: '40px 0 20px' }}>
         <input
           type="text"
           value={title}
@@ -86,19 +148,23 @@ export default function AdminWriteNewPage() {
             width: '100%',
             background: 'transparent',
             border: 'none',
-            borderBottom: '2px solid var(--border)',
-            color: 'var(--text)',
-            fontSize: '2em',
+            borderBottom: '2px solid rgba(70, 72, 78, 0.3)',
+            color: '#e4e5ed',
+            fontSize: '2.5em',
             fontFamily: 'inherit',
-            fontWeight: 'bold',
+            fontWeight: 800,
+            letterSpacing: '-0.04em',
             padding: '8px 0',
             outline: 'none',
+            transition: 'border-color 0.2s',
           }}
+          onFocus={(e) => { e.target.style.borderBottomColor = '#5a7af8'; }}
+          onBlur={(e) => { e.target.style.borderBottomColor = 'rgba(70, 72, 78, 0.3)'; }}
         />
       </div>
 
-      {/* 에디터 */}
-      <div style={{ paddingBottom: '48px' }}>
+      {/* Editor */}
+      <div style={{ paddingBottom: '64px' }}>
         <MarkdownEditor value={content} onChange={setContent} height={680} />
       </div>
     </div>

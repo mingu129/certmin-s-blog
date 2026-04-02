@@ -486,6 +486,74 @@ a:visited {
   flex-shrink: 0;
 }
 
+/* ===== HASHTAG / TAG PILLS ===== */
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.78em;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.05em;
+  background: var(--surface-high);
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.tag-pill:hover {
+  background: var(--surface-highest);
+  color: var(--text);
+  border-color: rgba(90, 122, 248, 0.3);
+}
+
+.tag-pill-active {
+  background: var(--primary-fixed) !important;
+  color: #000 !important;
+  border-color: transparent !important;
+}
+
+.hashtag-inline {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+  background: rgba(90, 122, 248, 0.1);
+  color: var(--primary-fixed);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+  text-decoration: none;
+}
+
+.hashtag-inline:hover {
+  background: rgba(90, 122, 248, 0.2);
+  color: var(--primary-fixed);
+  text-decoration: none;
+}
+
+/* ===== TAG CHIP (admin input) ===== */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: 600;
+  background: rgba(90, 122, 248, 0.15);
+  color: var(--primary-fixed);
+  white-space: nowrap;
+  gap: 2px;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 600px) {
   .blog-container {

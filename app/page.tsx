@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import { getAllPosts } from '@/lib/posts';
+import PostsWithFilter from './components/PostsWithFilter';
+import HiddenAdminTrigger from './components/HiddenAdminTrigger';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const latestPosts = (await getAllPosts()).slice(0, 5);
+  const latestPosts = (await getAllPosts()).slice(0, 10);
 
   return (
     <main className="blog-container" style={{ paddingTop: '80px', paddingBottom: '96px' }}>
@@ -57,13 +59,13 @@ export default async function Home() {
             </p>
           </div>
 
-          {/* Recent posts */}
+          {/* Section heading */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: '20px',
+              marginBottom: '24px',
             }}
           >
             <div>
@@ -85,16 +87,7 @@ export default async function Home() {
               <p>아직 작성된 글이 없습니다.</p>
             </div>
           ) : (
-            <ul className="post-list">
-              {latestPosts.map((post) => (
-                <li key={post.slug} className="post-list-item">
-                  <Link href={`/blog/${post.slug}`} className="post-list-title">
-                    {post.title}
-                  </Link>
-                  <div className="post-list-meta">{post.date}</div>
-                </li>
-              ))}
-            </ul>
+            <PostsWithFilter posts={latestPosts} />
           )}
 
           {latestPosts.length > 0 && (
@@ -121,7 +114,6 @@ export default async function Home() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: '16px',
-                  fontSize: '1.4em',
                 }}
               >
                 <span className="material-symbols-outlined" style={{ color: '#5a7af8' }}>
@@ -139,7 +131,7 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="sidebar-block" style={{ position: 'sticky', top: '96px' }}>
+          <div className="sidebar-block">
             <div className="sidebar-block-title">링크</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <Link
@@ -151,7 +143,6 @@ export default async function Home() {
                   fontSize: '0.85em',
                   color: '#a9abb2',
                   textDecoration: 'none',
-                  transition: 'color 0.2s',
                 }}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>article</span>
@@ -168,7 +159,6 @@ export default async function Home() {
                   fontSize: '0.85em',
                   color: '#a9abb2',
                   textDecoration: 'none',
-                  transition: 'color 0.2s',
                 }}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>code</span>
@@ -179,6 +169,8 @@ export default async function Home() {
         </div>
 
       </div>
+
+      <HiddenAdminTrigger />
     </main>
   );
 }

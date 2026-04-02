@@ -22,7 +22,7 @@ export async function GET() {
         const raw = await redis.get(`kv:post:${slug}`);
         if (!raw) return null;
         const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        return { slug: data.slug, title: data.title, date: data.date, updatedAt: data.updatedAt };
+        return { slug: data.slug, title: data.title, date: data.date, updatedAt: data.updatedAt, tags: data.tags || [], thumbnail: data.thumbnail || null };
       })
     );
 
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '인증 실패. 다시 로그인해주세요.' }, { status: 401 });
     }
 
-    const { title, content } = await request.json();
+    const { title, content, tags, thumbnail } = await request.json();
 
     if (!title?.trim() || !content?.trim()) {
       return NextResponse.json({ error: '제목과 내용을 입력해주세요.' }, { status: 400 });
@@ -51,7 +51,14 @@ export async function POST(request: Request) {
     const date = new Date().toISOString().slice(0, 10);
     const slug = `${date}-${Date.now()}`;
 
-    const post = { slug, title: title.trim(), date, content: content.trim() };
+    const post = {
+      slug,
+      title: title.trim(),
+      date,
+      content: content.trim(),
+      tags: Array.isArray(tags) ? tags : [],
+      thumbnail: thumbnail || null,
+    };
 
     await redis.set(`kv:post:${slug}`, JSON.stringify(post));
     await redis.zadd('kv:posts', Date.now(), slug);

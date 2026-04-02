@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getPostBySlug } from '@/lib/posts';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
@@ -14,11 +15,10 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     notFound();
   }
 
+  const tags = post.tags ?? [];
+
   return (
-    <main
-      className="blog-container"
-      style={{ paddingTop: '80px', paddingBottom: '96px' }}
-    >
+    <main className="blog-container" style={{ paddingTop: '80px', paddingBottom: '96px' }}>
       <div
         style={{
           display: 'flex',
@@ -29,8 +29,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
       >
         {/* Sticky sidebar */}
         <aside
+          className="post-sidebar"
           style={{
-            width: '240px',
+            width: '220px',
             flexShrink: 0,
             position: 'sticky',
             top: '96px',
@@ -39,16 +40,8 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             padding: '24px',
             display: 'none',
           }}
-          className="post-sidebar"
         >
-          <div
-            style={{
-              fontSize: '0.95em',
-              fontWeight: 700,
-              color: '#b8c4ff',
-              marginBottom: '4px',
-            }}
-          >
+          <div style={{ fontSize: '0.95em', fontWeight: 700, color: '#b8c4ff', marginBottom: '4px' }}>
             목차
           </div>
           <div
@@ -68,12 +61,40 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               시작
             </a>
           </nav>
+
+          {tags.length > 0 && (
+            <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid rgba(70,72,78,0.2)' }}>
+              <div
+                style={{
+                  fontSize: '0.65em',
+                  fontWeight: 700,
+                  color: '#a9abb2',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  marginBottom: '12px',
+                }}
+              >
+                태그
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {tags.map((tag) => (
+                  <Link
+                    key={tag}
+                    href={`/?tag=${encodeURIComponent(tag)}`}
+                    className="hashtag-inline"
+                  >
+                    #{tag}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </aside>
 
         {/* Article */}
         <article style={{ flex: 1, minWidth: 0 }}>
           {/* Header */}
-          <header className="post-header">
+          <header style={{ marginBottom: '32px' }}>
             <div
               style={{
                 display: 'flex',
@@ -83,17 +104,20 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 flexWrap: 'wrap',
               }}
             >
-              <span className="category-tag">블로그</span>
-              <div
-                style={{
-                  height: '1px',
-                  width: '32px',
-                  background: 'rgba(70,72,78,0.3)',
-                }}
-              />
-              <time className="post-meta" id="post-top">
-                {post.date}
-              </time>
+              {tags.map((tag) => (
+                <Link
+                  key={tag}
+                  href={`/?tag=${encodeURIComponent(tag)}`}
+                  className="category-tag"
+                  style={{ textDecoration: 'none' }}
+                >
+                  {tag}
+                </Link>
+              ))}
+              {tags.length > 0 && (
+                <div style={{ height: '1px', width: '32px', background: 'rgba(70,72,78,0.3)' }} />
+              )}
+              <time id="post-top" className="post-meta">{post.date}</time>
               {post.updatedAt && (
                 <>
                   <span style={{ color: '#a9abb2', opacity: 0.4 }}>•</span>
@@ -103,6 +127,30 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </div>
 
             <h1 className="post-main-title">{post.title}</h1>
+
+            {/* Thumbnail hero */}
+            {post.thumbnail && (
+              <div
+                style={{
+                  width: '100%',
+                  height: '320px',
+                  borderRadius: '0.75rem',
+                  overflow: 'hidden',
+                  marginTop: '24px',
+                  background: '#1e2024',
+                }}
+              >
+                <Image
+                  src={post.thumbnail}
+                  alt={post.title}
+                  width={1200}
+                  height={320}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
+                  unoptimized
+                  priority
+                />
+              </div>
+            )}
 
             {/* Decorative separator */}
             <div
@@ -163,6 +211,22 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               {post.content}
             </ReactMarkdown>
           </div>
+
+          {/* Bottom tags */}
+          {tags.length > 0 && (
+            <div style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid rgba(70,72,78,0.15)', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {tags.map((tag) => (
+                <Link
+                  key={tag}
+                  href={`/?tag=${encodeURIComponent(tag)}`}
+                  className="hashtag-inline"
+                  style={{ textDecoration: 'none' }}
+                >
+                  #{tag}
+                </Link>
+              ))}
+            </div>
+          )}
 
           {/* Post nav */}
           <div className="post-nav">

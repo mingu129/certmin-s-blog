@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getAllPosts } from '@/lib/posts';
 
 export const dynamic = 'force-dynamic';
@@ -51,10 +52,40 @@ export default async function BlogPage() {
         <ul className="post-list">
           {posts.map((post) => (
             <li key={post.slug} className="post-list-item">
-              <Link href={`/blog/${post.slug}`} className="post-list-title">
-                {post.title}
-              </Link>
-              <div className="post-list-meta">{post.date}</div>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <Link href={`/blog/${post.slug}`} className="post-list-title">
+                    {post.title}
+                  </Link>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px', flexWrap: 'wrap' }}>
+                    <span className="post-list-meta">{post.date}</span>
+                    {(post.tags ?? []).map((tag) => (
+                      <span key={tag} className="hashtag-inline">#{tag}</span>
+                    ))}
+                  </div>
+                </div>
+                {post.thumbnail && (
+                  <div
+                    style={{
+                      width: '72px',
+                      height: '72px',
+                      borderRadius: '0.5rem',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      background: '#1e2024',
+                    }}
+                  >
+                    <Image
+                      src={post.thumbnail}
+                      alt={post.title}
+                      width={72}
+                      height={72}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      unoptimized
+                    />
+                  </div>
+                )}
+              </div>
             </li>
           ))}
         </ul>

@@ -6,6 +6,8 @@ export interface PostData {
   date: string;
   content: string;
   updatedAt?: string;
+  tags?: string[];
+  thumbnail?: string;
 }
 
 export async function getAllPosts(): Promise<PostData[]> {

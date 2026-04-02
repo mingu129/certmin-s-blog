@@ -87,12 +87,13 @@ export default function AdminWritePage() {
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {[
-            { icon: 'dashboard', label: '개요', active: true },
-            { icon: 'article', label: '글 목록', active: false },
-          ].map(({ icon, label, active }) => (
-            <a
+            { icon: 'dashboard', label: '개요', href: '/admin/write', active: true },
+            { icon: 'article', label: '글 목록', href: '/admin/write', active: false },
+            { icon: 'tune', label: '블로그 설정', href: '/admin/settings', active: false },
+          ].map(({ icon, label, href, active }) => (
+            <Link
               key={label}
-              href="#"
+              href={href}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -108,7 +109,7 @@ export default function AdminWritePage() {
             >
               <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>{icon}</span>
               {label}
-            </a>
+            </Link>
           ))}
 
           <div style={{ height: '1px', background: 'rgba(70,72,78,0.2)', margin: '8px 0' }} />

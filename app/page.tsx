@@ -1,12 +1,16 @@
 import Link from 'next/link';
 import { getAllPosts } from '@/lib/posts';
+import { getSettings } from '@/lib/settings';
 import PostsWithFilter from './components/PostsWithFilter';
-import HiddenAdminTrigger from './components/HiddenAdminTrigger';
+import ProfileSidebar from './components/ProfileSidebar';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const latestPosts = (await getAllPosts()).slice(0, 10);
+  const [latestPosts, settings] = await Promise.all([
+    getAllPosts().then((p) => p.slice(0, 10)),
+    getSettings(),
+  ]);
 
   return (
     <main className="blog-container" style={{ paddingTop: '80px', paddingBottom: '96px' }}>
@@ -34,52 +38,47 @@ export default async function Home() {
             >
               블로그 아카이브
             </div>
+
+            {/* DungGeunMo only here */}
             <h1
               style={{
-                fontSize: '3em',
+                fontFamily: "'DungGeunMo', monospace",
+                fontSize: '2.8em',
                 fontWeight: 800,
                 color: '#e4e5ed',
-                letterSpacing: '-0.04em',
-                lineHeight: 1.1,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
                 marginBottom: '16px',
               }}
             >
               윤민규의{' '}
               <span style={{ color: '#b8c4ff' }}>개발 일지</span>
             </h1>
+
             <p
               style={{
-                fontSize: '1.1em',
+                fontSize: '1.05em',
                 color: '#a9abb2',
                 lineHeight: 1.7,
                 maxWidth: '560px',
               }}
             >
-              일상과 코드, 그리고 생각들을 기록합니다.
+              {settings.siteSubtitle}
             </p>
           </div>
 
           {/* Section heading */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '24px',
-            }}
-          >
-            <div>
-              <h2 className="section-heading">최근 글</h2>
-              <div
-                style={{
-                  width: '40px',
-                  height: '3px',
-                  background: '#5a7af8',
-                  borderRadius: '9999px',
-                  marginTop: '8px',
-                }}
-              />
-            </div>
+          <div style={{ marginBottom: '24px' }}>
+            <h2 className="section-heading">최근 글</h2>
+            <div
+              style={{
+                width: '40px',
+                height: '3px',
+                background: '#5a7af8',
+                borderRadius: '9999px',
+                marginTop: '8px',
+              }}
+            />
           </div>
 
           {latestPosts.length === 0 ? (
@@ -92,85 +91,21 @@ export default async function Home() {
 
           {latestPosts.length > 0 && (
             <div style={{ marginTop: '20px' }}>
-              <Link href="/blog" className="btn">
-                전체 글 보기 →
-              </Link>
+              <Link href="/blog" className="btn">전체 글 보기 →</Link>
             </div>
           )}
         </div>
 
         {/* ── 사이드바 ── */}
         <div className="side-col">
-          <div className="sidebar-block">
-            <div className="sidebar-block-title">소개</div>
-            <div className="sidebar-about">
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  background: 'var(--surface-high)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '16px',
-                }}
-              >
-                <span className="material-symbols-outlined" style={{ color: '#5a7af8' }}>
-                  person
-                </span>
-              </div>
-              <div style={{ fontWeight: 700, color: '#e4e5ed', marginBottom: '8px' }}>
-                윤민규
-              </div>
-              <div style={{ fontSize: '0.88em', color: '#a9abb2', lineHeight: 1.8 }}>
-                코딩과 블로그를 좋아합니다.
-                <br />
-                일상과 생각을 기록합니다.
-              </div>
-            </div>
-          </div>
-
-          <div className="sidebar-block">
-            <div className="sidebar-block-title">링크</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <Link
-                href="/blog"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '0.85em',
-                  color: '#a9abb2',
-                  textDecoration: 'none',
-                }}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>article</span>
-                글 목록
-              </Link>
-              <a
-                href="https://github.com/mingu129"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '0.85em',
-                  color: '#a9abb2',
-                  textDecoration: 'none',
-                }}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>code</span>
-                GitHub
-              </a>
-            </div>
-          </div>
+          <ProfileSidebar
+            profileName={settings.profileName}
+            profileDescription={settings.profileDescription}
+            profilePhoto={settings.profilePhoto}
+          />
         </div>
 
       </div>
-
-      <HiddenAdminTrigger />
     </main>
   );
 }

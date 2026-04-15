@@ -9,7 +9,7 @@ export interface SiteSettings {
 
 const DEFAULT_SETTINGS: SiteSettings = {
   siteSubtitle: '일상과 코드, 그리고 생각들을 기록합니다.',
-  profileName: '윤민규',
+  profileName: 'certmin',
   profileDescription: '코딩과 블로그를 좋아합니다.\n일상과 생각을 기록합니다.',
   profilePhoto: null,
 };

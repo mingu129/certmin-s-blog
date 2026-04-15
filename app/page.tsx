@@ -27,12 +27,12 @@ export default async function Home() {
                 alignItems: 'center',
                 padding: '4px 12px',
                 borderRadius: '9999px',
-                background: 'rgba(55, 58, 77, 0.5)',
+                background: 'var(--pill-bg)',
                 fontSize: '0.72em',
                 fontWeight: 700,
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                color: '#c2c5dd',
+                color: 'var(--pill-text)',
                 marginBottom: '20px',
               }}
             >
@@ -45,20 +45,20 @@ export default async function Home() {
                 fontFamily: "'DungGeunMo', monospace",
                 fontSize: '2.8em',
                 fontWeight: 800,
-                color: '#e4e5ed',
+                color: 'var(--text)',
                 letterSpacing: '-0.02em',
                 lineHeight: 1.15,
                 marginBottom: '16px',
               }}
             >
-              윤민규의{' '}
-              <span style={{ color: '#b8c4ff' }}>개발 일지</span>
+              certmin의{' '}
+              <span style={{ color: 'var(--primary)' }}>개발 일지</span>
             </h1>
 
             <p
               style={{
                 fontSize: '1.05em',
-                color: '#a9abb2',
+                color: 'var(--text-muted)',
                 lineHeight: 1.7,
                 maxWidth: '560px',
               }}
@@ -74,7 +74,7 @@ export default async function Home() {
               style={{
                 width: '40px',
                 height: '3px',
-                background: '#5a7af8',
+                background: 'var(--primary-fixed)',
                 borderRadius: '9999px',
                 marginTop: '8px',
               }}

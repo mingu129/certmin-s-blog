@@ -35,13 +35,13 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             flexShrink: 0,
             position: 'sticky',
             top: '96px',
-            background: '#121317',
+            background: 'var(--surface)',
             borderRadius: '0.5rem',
             padding: '24px',
             display: 'none',
           }}
         >
-          <div style={{ fontSize: '0.95em', fontWeight: 700, color: '#b8c4ff', marginBottom: '4px' }}>
+          <div style={{ fontSize: '0.95em', fontWeight: 700, color: 'var(--primary)', marginBottom: '4px' }}>
             목차
           </div>
           <div
@@ -49,7 +49,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               fontSize: '0.7em',
               textTransform: 'uppercase',
               letterSpacing: '0.18em',
-              color: '#a9abb2',
+              color: 'var(--text-muted)',
               marginBottom: '20px',
             }}
           >
@@ -63,12 +63,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           </nav>
 
           {tags.length > 0 && (
-            <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid rgba(70,72,78,0.2)' }}>
+            <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--border-faint)' }}>
               <div
                 style={{
                   fontSize: '0.65em',
                   fontWeight: 700,
-                  color: '#a9abb2',
+                  color: 'var(--text-muted)',
                   letterSpacing: '0.18em',
                   textTransform: 'uppercase',
                   marginBottom: '12px',
@@ -115,12 +115,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 </Link>
               ))}
               {tags.length > 0 && (
-                <div style={{ height: '1px', width: '32px', background: 'rgba(70,72,78,0.3)' }} />
+                <div style={{ height: '1px', width: '32px', background: 'var(--border-ghost)' }} />
               )}
               <time id="post-top" className="post-meta">{post.date}</time>
               {post.updatedAt && (
                 <>
-                  <span style={{ color: '#a9abb2', opacity: 0.4 }}>•</span>
+                  <span style={{ color: 'var(--text-muted)', opacity: 0.4 }}>•</span>
                   <span className="post-meta">수정: {post.updatedAt}</span>
                 </>
               )}
@@ -137,7 +137,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                   borderRadius: '0.75rem',
                   overflow: 'hidden',
                   marginTop: '24px',
-                  background: '#1e2024',
+                  background: 'var(--surface-high)',
                 }}
               >
                 <Image
@@ -166,14 +166,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  background: '#1e2024',
+                  background: 'var(--surface-high)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px solid rgba(70,72,78,0.2)',
+                  border: '1px solid var(--border-faint)',
                 }}
               >
-                <span className="material-symbols-outlined" style={{ color: '#b8c4ff', fontSize: '18px' }}>
+                <span className="material-symbols-outlined" style={{ color: 'var(--primary)', fontSize: '18px' }}>
                   bolt
                 </span>
               </div>
@@ -181,7 +181,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 style={{
                   flex: 1,
                   height: '1px',
-                  background: 'linear-gradient(to right, rgba(70,72,78,0.3), transparent)',
+                  background: 'linear-gradient(to right, var(--border-ghost), transparent)',
                 }}
               />
             </div>
@@ -214,7 +214,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
           {/* Bottom tags */}
           {tags.length > 0 && (
-            <div style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid rgba(70,72,78,0.15)', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid var(--border-subtle)', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {tags.map((tag) => (
                 <Link
                   key={tag}

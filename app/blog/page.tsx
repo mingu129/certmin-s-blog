@@ -17,12 +17,12 @@ export default async function BlogPage() {
             alignItems: 'center',
             padding: '4px 12px',
             borderRadius: '9999px',
-            background: 'rgba(55, 58, 77, 0.5)',
+            background: 'var(--pill-bg)',
             fontSize: '0.72em',
             fontWeight: 700,
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
-            color: '#c2c5dd',
+            color: 'var(--pill-text)',
             marginBottom: '16px',
           }}
         >
@@ -33,13 +33,13 @@ export default async function BlogPage() {
             fontSize: '2.5em',
             fontWeight: 800,
             letterSpacing: '-0.04em',
-            color: '#e4e5ed',
+            color: 'var(--text)',
             marginBottom: '10px',
           }}
         >
           전체 글 목록
         </h1>
-        <p style={{ color: '#a9abb2', fontSize: '0.95em' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.95em' }}>
           총 {posts.length}개의 글이 있습니다.
         </p>
       </div>
@@ -72,7 +72,7 @@ export default async function BlogPage() {
                       borderRadius: '0.5rem',
                       overflow: 'hidden',
                       flexShrink: 0,
-                      background: '#1e2024',
+                      background: 'var(--surface-high)',
                     }}
                   >
                     <Image

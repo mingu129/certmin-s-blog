@@ -59,7 +59,7 @@ export default function PostsWithFilter({ posts }: { posts: Post[] }) {
       {!anyVisible ? (
         <div className="empty-state">
           <p>
-            <span style={{ color: '#5a7af8' }}>#{activeTag}</span> 태그의 글이 없습니다.
+            <span style={{ color: 'var(--primary-fixed)' }}>#{activeTag}</span> 태그의 글이 없습니다.
           </p>
         </div>
       ) : (
@@ -117,7 +117,7 @@ export default function PostsWithFilter({ posts }: { posts: Post[] }) {
                         borderRadius: '0.5rem',
                         overflow: 'hidden',
                         flexShrink: 0,
-                        background: '#1e2024',
+                        background: 'var(--surface-high)',
                       }}
                     >
                       <Image

@@ -51,7 +51,7 @@ export default function ProfileSidebar({ profileName, profileDescription, profil
               marginBottom: '16px',
               cursor: 'pointer',
               overflow: 'hidden',
-              border: '2px solid rgba(90,122,248,0.15)',
+              border: '2px solid var(--accent-soft-hover)',
               transition: 'border-color 0.2s',
               userSelect: 'none',
               flexShrink: 0,
@@ -68,16 +68,16 @@ export default function ProfileSidebar({ profileName, profileDescription, profil
                 unoptimized
               />
             ) : (
-              <span className="material-symbols-outlined" style={{ color: '#5a7af8', fontSize: '24px' }}>
+              <span className="material-symbols-outlined" style={{ color: 'var(--primary-fixed)', fontSize: '24px' }}>
                 person
               </span>
             )}
           </div>
 
-          <div style={{ fontWeight: 700, color: '#e4e5ed', marginBottom: '8px' }}>
+          <div style={{ fontWeight: 700, color: 'var(--text)', marginBottom: '8px' }}>
             {profileName}
           </div>
-          <div style={{ fontSize: '0.88em', color: '#a9abb2', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
+          <div style={{ fontSize: '0.88em', color: 'var(--text-muted)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
             {profileDescription}
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function ProfileSidebar({ profileName, profileDescription, profil
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <Link
             href="/blog"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85em', color: '#a9abb2', textDecoration: 'none' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85em', color: 'var(--text-muted)', textDecoration: 'none' }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>article</span>
             글 목록
@@ -98,7 +98,7 @@ export default function ProfileSidebar({ profileName, profileDescription, profil
             href="https://github.com/mingu129"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85em', color: '#a9abb2', textDecoration: 'none' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85em', color: 'var(--text-muted)', textDecoration: 'none' }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>code</span>
             GitHub

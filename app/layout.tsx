@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import ThemeToggle from "./components/ThemeToggle";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -11,7 +12,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "윤민규의 블로그",
+  title: "certmin",
   description: "일상과 생각을 기록하는 개인 블로그",
 };
 
@@ -20,14 +21,17 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const themeInitScript = `(function(){try{var s=localStorage.getItem('theme');var t=s==='light'||s==='dark'?s:(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={manrope.variable}>
+    <html lang="ko" className={manrope.variable} data-theme="dark" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
@@ -41,9 +45,10 @@ export default function RootLayout({
             top: 0,
             width: "100%",
             zIndex: 50,
-            backgroundColor: "rgba(13, 14, 17, 0.6)",
+            backgroundColor: "var(--glass-nav-bg)",
             backdropFilter: "blur(16px)",
             WebkitBackdropFilter: "blur(16px)",
+            borderBottom: "1px solid var(--border-subtle)",
           }}
         >
           <nav
@@ -63,12 +68,12 @@ export default function RootLayout({
                 style={{
                   fontSize: "1.35em",
                   fontWeight: 800,
-                  color: "#b8c4ff",
+                  color: "var(--primary)",
                   letterSpacing: "-0.04em",
                   textDecoration: "none",
                 }}
               >
-                윤민규 블로그
+                certmin
               </Link>
               <div
                 style={{
@@ -82,6 +87,8 @@ export default function RootLayout({
                 <Link href="/blog" className="nav-link">글 목록</Link>
               </div>
             </div>
+
+            <ThemeToggle />
           </nav>
         </header>
 
@@ -102,8 +109,8 @@ export default function RootLayout({
               opacity: 0.8,
             }}
           >
-            <span style={{ fontWeight: 700, color: "#a9abb2" }}>
-              윤민규 블로그
+            <span style={{ fontWeight: 700, color: "var(--text-muted)" }}>
+              certmin
             </span>
             <span
               style={{
@@ -112,7 +119,7 @@ export default function RootLayout({
                 fontSize: "0.9em",
               }}
             >
-              © 2026 윤민규의 블로그. Built for the archive.
+              © 2026 certmin. Built for the archive.
             </span>
             <div style={{ display: "flex", gap: "24px" }}>
               <a
@@ -123,7 +130,7 @@ export default function RootLayout({
                   textTransform: "uppercase",
                   letterSpacing: "0.15em",
                   fontSize: "0.9em",
-                  color: "#a9abb2",
+                  color: "var(--text-muted)",
                   textDecoration: "none",
                   transition: "color 0.2s",
                 }}

@@ -178,9 +178,11 @@ export default function BlogPostList({ posts, initialTag = null }: Props) {
         </ul>
       )}
 
-      {/* Card view */}
+      {/* Card view — key on activeTag forces re-mount → CSS enter animation */}
       {anyVisible && view === 'card' && (
         <div
+          key={activeTag}
+          className="card-grid-enter"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',

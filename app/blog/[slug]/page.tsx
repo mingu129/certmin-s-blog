@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPostBySlug } from '@/lib/posts';
+import { getPostGradient } from '@/lib/thumbnail';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
@@ -128,29 +129,59 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
             <h1 className="post-main-title">{post.title}</h1>
 
-            {/* Thumbnail hero */}
-            {post.thumbnail && (
-              <div
-                style={{
-                  width: '100%',
-                  height: '320px',
-                  borderRadius: '0.75rem',
-                  overflow: 'hidden',
-                  marginTop: '24px',
-                  background: 'var(--surface-high)',
-                }}
-              >
+            {/* Thumbnail hero — 16:9, always shown */}
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                aspectRatio: '16/9',
+                borderRadius: '0.75rem',
+                overflow: 'hidden',
+                marginTop: '24px',
+                background: post.thumbnail ? 'var(--surface-high)' : getPostGradient(post.slug),
+              }}
+            >
+              {post.thumbnail ? (
                 <Image
                   src={post.thumbnail}
                   alt={post.title}
-                  width={1200}
-                  height={320}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
+                  fill
+                  style={{ objectFit: 'cover' }}
                   unoptimized
                   priority
                 />
-              </div>
-            )}
+              ) : (
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '12px',
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: '48px', color: 'rgba(255,255,255,0.2)' }}
+                  >
+                    article
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.75em',
+                      color: 'rgba(255,255,255,0.2)',
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      fontWeight: 600,
+                    }}
+                  >
+                    certmin
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* Decorative separator */}
             <div

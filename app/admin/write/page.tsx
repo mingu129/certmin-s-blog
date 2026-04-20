@@ -56,7 +56,7 @@ export default function AdminWritePage() {
         style={{
           width: '240px',
           flexShrink: 0,
-          background: '#121317',
+          background: 'var(--surface)',
           borderRadius: '0.5rem',
           padding: '24px',
           position: 'sticky',
@@ -68,7 +68,7 @@ export default function AdminWritePage() {
             style={{
               fontSize: '0.95em',
               fontWeight: 700,
-              color: '#b8c4ff',
+              color: 'var(--primary)',
               marginBottom: '4px',
             }}
           >
@@ -77,7 +77,7 @@ export default function AdminWritePage() {
           <div
             style={{
               fontSize: '0.7em',
-              color: '#a9abb2',
+              color: 'var(--text-muted)',
               letterSpacing: '0.05em',
             }}
           >
@@ -100,9 +100,9 @@ export default function AdminWritePage() {
                 gap: '10px',
                 padding: '10px 0 10px 16px',
                 fontSize: '0.88em',
-                color: active ? '#5a7af8' : '#a9abb2',
+                color: active ? 'var(--accent)' : 'var(--text-muted)',
                 fontWeight: active ? 700 : 400,
-                borderLeft: active ? '2px solid #5a7af8' : '2px solid transparent',
+                borderLeft: active ? '2px solid var(--accent)' : '2px solid transparent',
                 textDecoration: 'none',
                 transition: 'all 0.2s',
               }}
@@ -112,7 +112,7 @@ export default function AdminWritePage() {
             </Link>
           ))}
 
-          <div style={{ height: '1px', background: 'rgba(70,72,78,0.2)', margin: '8px 0' }} />
+          <div style={{ height: '1px', background: 'var(--border-faint)', margin: '8px 0' }} />
 
           <Link
             href="/"
@@ -122,7 +122,7 @@ export default function AdminWritePage() {
               gap: '10px',
               padding: '10px 0 10px 16px',
               fontSize: '0.88em',
-              color: '#a9abb2',
+              color: 'var(--text-muted)',
               textDecoration: 'none',
               transition: 'color 0.2s',
             }}
@@ -139,7 +139,7 @@ export default function AdminWritePage() {
               gap: '10px',
               padding: '10px 0 10px 16px',
               fontSize: '0.88em',
-              color: '#a9abb2',
+              color: 'var(--text-muted)',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
@@ -166,12 +166,12 @@ export default function AdminWritePage() {
               alignItems: 'center',
               padding: '4px 12px',
               borderRadius: '9999px',
-              background: 'rgba(55, 58, 77, 0.3)',
+              background: 'var(--pill-bg)',
               fontSize: '0.7em',
               fontWeight: 700,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              color: '#c2c5dd',
+              color: 'var(--secondary-container-text)',
               alignSelf: 'flex-start',
             }}
           >
@@ -182,13 +182,13 @@ export default function AdminWritePage() {
               fontSize: '2.5em',
               fontWeight: 800,
               letterSpacing: '-0.04em',
-              color: '#e4e5ed',
+              color: 'var(--text)',
             }}
           >
             관리 콘솔
           </h1>
-          <p style={{ color: '#a9abb2', maxWidth: '560px', lineHeight: 1.7 }}>
-            현재 아카이브에는 <strong style={{ color: '#e4e5ed' }}>{posts.length}개</strong>의 글이 있습니다.
+          <p style={{ color: 'var(--text-muted)', maxWidth: '560px', lineHeight: 1.7 }}>
+            현재 아카이브에는 <strong style={{ color: 'var(--text)' }}>{posts.length}개</strong>의 글이 있습니다.
           </p>
         </header>
 
@@ -203,8 +203,8 @@ export default function AdminWritePage() {
           {/* Total posts */}
           <div className="stat-card stat-card-accent">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <span className="material-symbols-outlined" style={{ color: '#5a7af8', fontSize: '22px' }}>analytics</span>
-              <span style={{ fontSize: '0.72em', color: '#a9abb2', fontWeight: 500, letterSpacing: '0.05em' }}>전체</span>
+              <span className="material-symbols-outlined" style={{ color: 'var(--accent)', fontSize: '22px' }}>analytics</span>
+              <span style={{ fontSize: '0.72em', color: 'var(--text-muted)', fontWeight: 500, letterSpacing: '0.05em' }}>전체</span>
             </div>
             <div>
               <div
@@ -212,27 +212,27 @@ export default function AdminWritePage() {
                   fontSize: '2em',
                   fontWeight: 800,
                   letterSpacing: '-0.04em',
-                  color: '#e4e5ed',
+                  color: 'var(--text)',
                 }}
               >
                 {posts.length}
               </div>
-              <div style={{ fontSize: '0.85em', color: '#a9abb2' }}>작성된 글</div>
+              <div style={{ fontSize: '0.85em', color: 'var(--text-muted)' }}>작성된 글</div>
             </div>
           </div>
 
           {/* Latest post */}
           <div className="stat-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <span className="material-symbols-outlined" style={{ color: '#c2c5dd', fontSize: '22px' }}>edit_note</span>
-              <span style={{ fontSize: '0.72em', color: '#a9abb2', fontWeight: 500, letterSpacing: '0.05em' }}>최근</span>
+              <span className="material-symbols-outlined" style={{ color: 'var(--text-muted)', fontSize: '22px' }}>edit_note</span>
+              <span style={{ fontSize: '0.72em', color: 'var(--text-muted)', fontWeight: 500, letterSpacing: '0.05em' }}>최근</span>
             </div>
             <div>
               <div
                 style={{
                   fontSize: '0.88em',
                   fontWeight: 600,
-                  color: '#e4e5ed',
+                  color: 'var(--text)',
                   marginBottom: '4px',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -241,7 +241,7 @@ export default function AdminWritePage() {
               >
                 {posts[0]?.title || '—'}
               </div>
-              <div style={{ fontSize: '0.78em', color: '#a9abb2' }}>{posts[0]?.date || '글 없음'}</div>
+              <div style={{ fontSize: '0.78em', color: 'var(--text-muted)' }}>{posts[0]?.date || '글 없음'}</div>
             </div>
           </div>
 
@@ -256,14 +256,14 @@ export default function AdminWritePage() {
               gap: '12px',
               padding: '32px',
               borderRadius: '0.75rem',
-              background: '#5a7af8',
+              background: 'var(--accent)',
               color: '#000',
               textDecoration: 'none',
               minHeight: '176px',
               fontWeight: 700,
               fontSize: '1.05em',
               transition: 'transform 0.15s, filter 0.15s',
-              boxShadow: '0 8px 32px rgba(90,122,248,0.15)',
+              boxShadow: '0 8px 32px var(--accent-soft-hover)',
             }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLElement).style.transform = 'scale(1.02)';
@@ -294,13 +294,13 @@ export default function AdminWritePage() {
                   fontSize: '1.4em',
                   fontWeight: 700,
                   letterSpacing: '-0.03em',
-                  color: '#e4e5ed',
+                  color: 'var(--text)',
                   marginBottom: '4px',
                 }}
               >
                 글 목록
               </h2>
-              <p style={{ fontSize: '0.82em', color: '#a9abb2' }}>최근 수정순</p>
+              <p style={{ fontSize: '0.82em', color: 'var(--text-muted)' }}>최근 수정순</p>
             </div>
           </div>
 
@@ -311,7 +311,7 @@ export default function AdminWritePage() {
           ) : (
             <div
               style={{
-                background: '#121317',
+                background: 'var(--surface)',
                 borderRadius: '0.75rem',
                 overflow: 'hidden',
               }}
@@ -322,12 +322,12 @@ export default function AdminWritePage() {
                   display: 'flex',
                   alignItems: 'center',
                   padding: '12px 32px',
-                  background: 'rgba(30, 32, 36, 0.4)',
+                  background: 'var(--surface-container)',
                   fontSize: '0.65em',
                   fontWeight: 700,
                   letterSpacing: '0.2em',
                   textTransform: 'uppercase',
-                  color: '#a9abb2',
+                  color: 'var(--text-muted)',
                 }}
               >
                 <div style={{ flex: 1 }}>제목 & 슬러그</div>
@@ -342,7 +342,7 @@ export default function AdminWritePage() {
                   key={post.slug}
                   className="admin-table-row"
                   style={{
-                    borderTop: i > 0 ? '1px solid rgba(70,72,78,0.1)' : 'none',
+                    borderTop: i > 0 ? '1px solid var(--border-faint)' : 'none',
                   }}
                 >
                   <div
@@ -359,21 +359,21 @@ export default function AdminWritePage() {
                         width: '40px',
                         height: '40px',
                         borderRadius: '0.5rem',
-                        background: '#23262c',
+                        background: 'var(--surface-highest)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         flexShrink: 0,
                       }}
                     >
-                      <span className="material-symbols-outlined" style={{ color: '#a9abb2', fontSize: '18px' }}>article</span>
+                      <span className="material-symbols-outlined" style={{ color: 'var(--text-muted)', fontSize: '18px' }}>article</span>
                     </div>
                     <div style={{ minWidth: 0 }}>
                       <Link
                         href={`/blog/${post.slug}`}
                         style={{
                           fontWeight: 700,
-                          color: '#e4e5ed',
+                          color: 'var(--text)',
                           fontSize: '0.9em',
                           display: 'block',
                           overflow: 'hidden',
@@ -388,8 +388,8 @@ export default function AdminWritePage() {
                         style={{
                           fontSize: '0.7em',
                           fontWeight: 500,
-                          color: '#5a7af8',
-                          background: 'rgba(30,69,195,0.15)',
+                          color: 'var(--accent)',
+                          background: 'var(--accent-soft)',
                           padding: '1px 8px',
                           borderRadius: '4px',
                         }}
@@ -408,14 +408,14 @@ export default function AdminWritePage() {
                     }}
                   >
                     <div className="status-dot-published" />
-                    <span style={{ fontSize: '0.78em', color: '#a9abb2', fontWeight: 500 }}>발행됨</span>
+                    <span style={{ fontSize: '0.78em', color: 'var(--text-muted)', fontWeight: 500 }}>발행됨</span>
                   </div>
 
                   <div
                     style={{
                       width: '120px',
                       fontSize: '0.82em',
-                      color: '#a9abb2',
+                      color: 'var(--text-muted)',
                       textAlign: 'right',
                     }}
                   >
@@ -434,7 +434,7 @@ export default function AdminWritePage() {
                       href={`/admin/edit/${post.slug}`}
                       title="수정"
                       style={{
-                        color: '#a9abb2',
+                        color: 'var(--text-muted)',
                         textDecoration: 'none',
                         transition: 'color 0.2s',
                         lineHeight: 1,
@@ -448,7 +448,7 @@ export default function AdminWritePage() {
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: '#a9abb2',
+                        color: 'var(--text-muted)',
                         cursor: 'pointer',
                         padding: 0,
                         transition: 'color 0.2s',

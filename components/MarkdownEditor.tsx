@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
@@ -25,6 +25,17 @@ async function uploadImage(file: File): Promise<string> {
 
 export default function MarkdownEditor({ value, onChange, height = 600 }: MarkdownEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [colorMode, setColorMode] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    const sync = () => {
+      setColorMode((document.documentElement.dataset.theme as 'dark' | 'light') || 'dark');
+    };
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
 
   async function handleImageUpload(file: File) {
     try {
@@ -48,7 +59,7 @@ export default function MarkdownEditor({ value, onChange, height = 600 }: Markdo
 
   return (
     <div
-      data-color-mode="dark"
+      data-color-mode={colorMode}
       onPaste={handlePaste}
       style={{
         border: '1px solid var(--border)',

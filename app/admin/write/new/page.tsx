@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import MarkdownEditor from '@/components/MarkdownEditor';
+import ThumbnailUploader from '@/components/ThumbnailUploader';
 
 export default function AdminWriteNewPage() {
   const router = useRouter();
@@ -13,10 +13,8 @@ export default function AdminWriteNewPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [thumbnail, setThumbnail] = useState('');
-  const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const thumbInputRef = useRef<HTMLInputElement>(null);
 
   function addTag(raw: string) {
     const tag = raw.trim().replace(/^#+/, '').trim();
@@ -32,22 +30,6 @@ export default function AdminWriteNewPage() {
       addTag(tagInput);
     } else if (e.key === 'Backspace' && tagInput === '' && tags.length > 0) {
       setTags((prev) => prev.slice(0, -1));
-    }
-  }
-
-  async function handleThumbnailUpload(file: File) {
-    setThumbnailLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.url) setThumbnail(data.url);
-      else setError('썸네일 업로드 실패');
-    } catch {
-      setError('썸네일 업로드 실패');
-    } finally {
-      setThumbnailLoading(false);
     }
   }
 
@@ -93,9 +75,10 @@ export default function AdminWriteNewPage() {
           position: 'sticky',
           top: 0,
           zIndex: 10,
-          background: 'rgba(13, 14, 17, 0.9)',
+          background: 'var(--glass-nav-bg)',
           backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(70, 72, 78, 0.15)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -108,7 +91,7 @@ export default function AdminWriteNewPage() {
           뒤로
         </Link>
         {error && (
-          <span style={{ color: '#f97386', fontSize: '0.82em', flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: 'var(--error)', fontSize: '0.82em', flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>error</span>
             {error}
           </span>
@@ -119,11 +102,11 @@ export default function AdminWriteNewPage() {
           disabled={loading}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '6px',
-            padding: '10px 24px', background: '#5a7af8', color: '#000',
+            padding: '10px 24px', background: 'var(--accent)', color: '#000',
             border: 'none', borderRadius: '0.5rem', fontSize: '0.82em',
             fontWeight: 700, fontFamily: 'inherit', letterSpacing: '0.1em',
             textTransform: 'uppercase', cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.7 : 1, boxShadow: '0 4px 16px rgba(90,122,248,0.2)',
+            opacity: loading ? 0.7 : 1, boxShadow: '0 4px 16px var(--accent-soft-hover)',
           }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>publish</span>
@@ -140,26 +123,26 @@ export default function AdminWriteNewPage() {
           placeholder="제목을 입력하세요"
           style={{
             width: '100%', background: 'transparent', border: 'none',
-            borderBottom: '2px solid rgba(70, 72, 78, 0.3)', color: '#e4e5ed',
+            borderBottom: '2px solid var(--border)', color: 'var(--text)',
             fontSize: '2.5em', fontFamily: 'inherit', fontWeight: 800,
             letterSpacing: '-0.04em', padding: '8px 0', outline: 'none',
           }}
-          onFocus={(e) => { e.target.style.borderBottomColor = '#5a7af8'; }}
-          onBlur={(e) => { e.target.style.borderBottomColor = 'rgba(70, 72, 78, 0.3)'; }}
+          onFocus={(e) => { e.target.style.borderBottomColor = 'var(--accent)'; }}
+          onBlur={(e) => { e.target.style.borderBottomColor = 'var(--border)'; }}
         />
       </div>
 
       {/* Tags + Thumbnail row */}
-      <div style={{ display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '32px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
         {/* Tags input */}
         <div style={{ flex: 1, minWidth: '260px' }}>
-          <div style={{ fontSize: '0.7em', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#a9abb2', marginBottom: '10px' }}>
+          <div style={{ fontSize: '0.7em', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '10px' }}>
             태그
           </div>
           <div
             style={{
               display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px',
-              background: '#1e2024', borderRadius: '0.5rem', padding: '8px 12px',
+              background: 'var(--surface-high)', borderRadius: '0.5rem', padding: '8px 12px',
               minHeight: '44px', cursor: 'text',
             }}
             onClick={() => document.getElementById('tag-input')?.focus()}
@@ -169,7 +152,7 @@ export default function AdminWriteNewPage() {
                 #{tag}
                 <button
                   onClick={(e) => { e.stopPropagation(); setTags((p) => p.filter((t) => t !== tag)); }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a9abb2', padding: '0 0 0 4px', lineHeight: 1, fontSize: '14px' }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '0 0 0 4px', lineHeight: 1, fontSize: '14px' }}
                 >×</button>
               </span>
             ))}
@@ -182,7 +165,7 @@ export default function AdminWriteNewPage() {
               placeholder={tags.length === 0 ? '태그 입력 후 Enter (예: React, TypeScript)' : ''}
               style={{
                 background: 'transparent', border: 'none', outline: 'none',
-                color: '#e4e5ed', fontSize: '0.85em', fontFamily: 'inherit',
+                color: 'var(--text)', fontSize: '0.85em', fontFamily: 'inherit',
                 flex: 1, minWidth: '120px',
               }}
             />
@@ -190,52 +173,15 @@ export default function AdminWriteNewPage() {
         </div>
 
         {/* Thumbnail */}
-        <div style={{ width: '280px' }}>
-          <div style={{ fontSize: '0.7em', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#a9abb2', marginBottom: '10px' }}>
+        <div style={{ width: '320px', flexShrink: 0 }}>
+          <div style={{ fontSize: '0.7em', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '10px' }}>
             썸네일
           </div>
-          <input
-            ref={thumbInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleThumbnailUpload(file);
-              e.target.value = '';
-            }}
+          <ThumbnailUploader
+            value={thumbnail}
+            onChange={setThumbnail}
+            onError={(msg) => setError(msg)}
           />
-          {thumbnail ? (
-            <div style={{ position: 'relative', height: '72px', borderRadius: '0.5rem', overflow: 'hidden', background: '#1e2024' }}>
-              <Image src={thumbnail} alt="thumbnail" fill style={{ objectFit: 'cover' }} unoptimized />
-              <button
-                onClick={() => setThumbnail('')}
-                style={{
-                  position: 'absolute', top: '6px', right: '6px',
-                  background: 'rgba(13,14,17,0.8)', border: 'none', borderRadius: '50%',
-                  width: '22px', height: '22px', cursor: 'pointer', color: '#e4e5ed',
-                  fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >×</button>
-            </div>
-          ) : (
-            <button
-              onClick={() => thumbInputRef.current?.click()}
-              disabled={thumbnailLoading}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '8px',
-                width: '100%', height: '44px', background: '#1e2024',
-                border: '1px dashed rgba(70,72,78,0.5)', borderRadius: '0.5rem',
-                color: '#a9abb2', fontSize: '0.82em', fontFamily: 'inherit',
-                cursor: 'pointer', justifyContent: 'center',
-              }}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-                {thumbnailLoading ? 'hourglass_empty' : 'image'}
-              </span>
-              {thumbnailLoading ? '업로드 중...' : '이미지 업로드'}
-            </button>
-          )}
         </div>
       </div>
 

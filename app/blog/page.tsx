@@ -1,16 +1,39 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { getAllPosts } from '@/lib/posts';
+import BlogPostList from '@/app/components/BlogPostList';
 
 export const dynamic = 'force-dynamic';
+
+function getExcerpt(content: string, maxLen = 120): string {
+  const plain = content
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`\n]+`/g, '')
+    .replace(/!\[.*?\]\(.*?\)/g, '')
+    .replace(/\[(.+?)\]\(.*?\)/g, '$1')
+    .replace(/#{1,6}\s+/g, '')
+    .replace(/[*_~>|]/g, '')
+    .replace(/\n+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return plain.length > maxLen ? plain.slice(0, maxLen) + '...' : plain;
+}
 
 export default async function BlogPage() {
   const posts = await getAllPosts();
 
+  const postItems = posts.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    date: p.date,
+    tags: p.tags,
+    thumbnail: p.thumbnail,
+    excerpt: getExcerpt(p.content),
+  }));
+
   return (
     <main className="blog-container" style={{ paddingTop: '80px', paddingBottom: '96px' }}>
       {/* Page header */}
-      <div style={{ marginBottom: '48px' }}>
+      <div style={{ marginBottom: '40px' }}>
         <div
           style={{
             display: 'inline-flex',
@@ -49,49 +72,10 @@ export default async function BlogPage() {
           <p>아직 작성된 글이 없습니다.</p>
         </div>
       ) : (
-        <ul className="post-list">
-          {posts.map((post) => (
-            <li key={post.slug} className="post-list-item">
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Link href={`/blog/${post.slug}`} className="post-list-title">
-                    {post.title}
-                  </Link>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px', flexWrap: 'wrap' }}>
-                    <span className="post-list-meta">{post.date}</span>
-                    {(post.tags ?? []).map((tag) => (
-                      <span key={tag} className="hashtag-inline">#{tag}</span>
-                    ))}
-                  </div>
-                </div>
-                {post.thumbnail && (
-                  <div
-                    style={{
-                      width: '72px',
-                      height: '72px',
-                      borderRadius: '0.5rem',
-                      overflow: 'hidden',
-                      flexShrink: 0,
-                      background: 'var(--surface-high)',
-                    }}
-                  >
-                    <Image
-                      src={post.thumbnail}
-                      alt={post.title}
-                      width={72}
-                      height={72}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      unoptimized
-                    />
-                  </div>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+        <BlogPostList posts={postItems} />
       )}
 
-      <div style={{ marginTop: '28px' }}>
+      <div style={{ marginTop: '32px' }}>
         <Link href="/" className="btn">← 홈으로</Link>
       </div>
     </main>

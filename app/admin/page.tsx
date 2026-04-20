@@ -43,7 +43,7 @@ export default function AdminLoginPage() {
         style={{
           width: '100%',
           maxWidth: '380px',
-          background: '#121317',
+          background: 'var(--surface)',
           borderRadius: '0.75rem',
           padding: '40px',
         }}
@@ -55,14 +55,14 @@ export default function AdminLoginPage() {
               width: '48px',
               height: '48px',
               borderRadius: '50%',
-              background: 'rgba(90, 122, 248, 0.1)',
+              background: 'var(--accent-soft)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '20px',
             }}
           >
-            <span className="material-symbols-outlined" style={{ color: '#5a7af8', fontSize: '24px' }}>
+            <span className="material-symbols-outlined" style={{ color: 'var(--accent)', fontSize: '24px' }}>
               lock
             </span>
           </div>
@@ -70,14 +70,14 @@ export default function AdminLoginPage() {
             style={{
               fontSize: '1.5em',
               fontWeight: 800,
-              color: '#e4e5ed',
+              color: 'var(--text)',
               letterSpacing: '-0.03em',
               marginBottom: '8px',
             }}
           >
             관리자 로그인
           </h1>
-          <p style={{ fontSize: '0.85em', color: '#a9abb2' }}>
+          <p style={{ fontSize: '0.85em', color: 'var(--text-muted)' }}>
             관리 콘솔에 접속하려면 비밀번호를 입력하세요.
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function AdminLoginPage() {
                 fontWeight: 700,
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                color: '#a9abb2',
+                color: 'var(--text-muted)',
                 marginBottom: '8px',
               }}
             >
@@ -106,17 +106,17 @@ export default function AdminLoginPage() {
               style={{
                 width: '100%',
                 padding: '12px 14px',
-                background: '#1e2024',
+                background: 'var(--surface-high)',
                 border: 'none',
                 borderRadius: '0.5rem',
-                color: '#e4e5ed',
+                color: 'var(--text)',
                 fontSize: '0.95em',
                 fontFamily: 'inherit',
                 outline: 'none',
                 transition: 'box-shadow 0.2s',
               }}
               onFocus={(e) => {
-                e.target.style.boxShadow = '0 0 0 1px rgba(90,122,248,0.4)';
+                e.target.style.boxShadow = '0 0 0 1px var(--accent-ring)';
               }}
               onBlur={(e) => {
                 e.target.style.boxShadow = 'none';
@@ -127,7 +127,7 @@ export default function AdminLoginPage() {
           {error && (
             <div
               style={{
-                color: '#f97386',
+                color: 'var(--error)',
                 fontSize: '0.82em',
                 marginBottom: '14px',
                 display: 'flex',
@@ -146,7 +146,7 @@ export default function AdminLoginPage() {
             style={{
               width: '100%',
               padding: '12px',
-              background: '#5a7af8',
+              background: 'var(--accent)',
               color: '#000',
               border: 'none',
               borderRadius: '0.5rem',

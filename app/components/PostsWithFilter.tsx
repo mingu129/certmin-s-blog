@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getPostGradient } from '@/lib/thumbnail';
 
 interface Post {
   slug: string;
@@ -17,6 +18,11 @@ export default function PostsWithFilter({ posts }: { posts: Post[] }) {
 
   const allTags = Array.from(new Set(posts.flatMap((p) => p.tags ?? [])));
 
+  const tagCounts = posts.reduce<Record<string, number>>((acc, p) => {
+    (p.tags ?? []).forEach((tag) => { acc[tag] = (acc[tag] || 0) + 1; });
+    return acc;
+  }, {});
+
   function toggleTag(tag: string) {
     setActiveTag((prev) => (prev === tag ? null : tag));
   }
@@ -29,14 +35,7 @@ export default function PostsWithFilter({ posts }: { posts: Post[] }) {
     <>
       {/* Tag filter row */}
       {allTags.length > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '8px',
-            marginBottom: '28px',
-          }}
-        >
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '28px' }}>
           <button
             onClick={() => setActiveTag(null)}
             className={activeTag === null ? 'tag-pill tag-pill-active' : 'tag-pill'}
@@ -50,6 +49,16 @@ export default function PostsWithFilter({ posts }: { posts: Post[] }) {
               className={activeTag === tag ? 'tag-pill tag-pill-active' : 'tag-pill'}
             >
               #{tag}
+              <span
+                style={{
+                  marginLeft: '5px',
+                  fontSize: '0.82em',
+                  fontWeight: 400,
+                  opacity: activeTag === tag ? 0.7 : 0.5,
+                }}
+              >
+                {tagCounts[tag]}
+              </span>
             </button>
           ))}
         </div>
@@ -75,61 +84,67 @@ export default function PostsWithFilter({ posts }: { posts: Post[] }) {
                   marginBottom: visible ? '10px' : '0px',
                   padding: visible ? undefined : '0',
                   overflow: 'hidden',
-                  transition:
-                    'opacity 0.25s ease, max-height 0.3s ease, margin 0.25s ease',
+                  transition: 'opacity 0.25s ease, max-height 0.3s ease, margin 0.25s ease',
                   pointerEvents: visible ? 'auto' : 'none',
                 }}
               >
-                <div className="post-list-item" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  {/* Text content */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <Link href={`/blog/${post.slug}`} className="post-list-title">
-                      {post.title}
-                    </Link>
+                <div className="post-list-item">
+                  <Link href={`/blog/${post.slug}`} style={{ display: 'flex', gap: '16px', alignItems: 'center', textDecoration: 'none' }}>
+                    {/* Thumbnail — always shown */}
                     <div
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        marginTop: '8px',
-                        flexWrap: 'wrap',
-                      }}
-                    >
-                      <span className="post-list-meta">{post.date}</span>
-                      {(post.tags ?? []).map((tag) => (
-                        <button
-                          key={tag}
-                          onClick={() => toggleTag(tag)}
-                          className="hashtag-inline"
-                        >
-                          #{tag}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Thumbnail */}
-                  {post.thumbnail && (
-                    <div
-                      style={{
-                        width: '72px',
-                        height: '72px',
-                        borderRadius: '0.5rem',
+                        width: '120px',
+                        height: '67px',
+                        borderRadius: '0.45rem',
                         overflow: 'hidden',
                         flexShrink: 0,
-                        background: 'var(--surface-high)',
+                        background: post.thumbnail ? 'var(--surface-high)' : getPostGradient(post.slug),
+                        position: 'relative',
                       }}
                     >
-                      <Image
-                        src={post.thumbnail}
-                        alt={post.title}
-                        width={72}
-                        height={72}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        unoptimized
-                      />
+                      {post.thumbnail ? (
+                        <Image
+                          src={post.thumbnail}
+                          alt={post.title}
+                          fill
+                          style={{ objectFit: 'cover' }}
+                          unoptimized
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            opacity: 0.3,
+                          }}
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: '22px', color: '#fff' }}>article</span>
+                        </div>
+                      )}
                     </div>
-                  )}
+
+                    {/* Text content */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span className="post-list-title" style={{ display: 'block', marginBottom: '6px' }}>
+                        {post.title}
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                        <span className="post-list-meta">{post.date}</span>
+                        {(post.tags ?? []).map((tag) => (
+                          <button
+                            key={tag}
+                            onClick={(e) => { e.preventDefault(); toggleTag(tag); }}
+                            className="hashtag-inline"
+                          >
+                            #{tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </Link>
                 </div>
               </li>
             );

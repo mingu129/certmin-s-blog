@@ -43,7 +43,7 @@ export async function PUT(
     }
 
     const { slug } = await params;
-    const { title, content } = await request.json();
+    const { title, content, tags, thumbnail } = await request.json();
 
     if (!title?.trim() || !content?.trim()) {
       return NextResponse.json({ error: '제목과 내용을 입력해주세요.' }, { status: 400 });
@@ -58,6 +58,8 @@ export async function PUT(
       title: title.trim(),
       content: content.trim(),
       updatedAt: new Date().toISOString().slice(0, 10),
+      tags: Array.isArray(tags) ? tags : (existing.tags || []),
+      thumbnail: thumbnail !== undefined ? thumbnail : (existing.thumbnail || null),
     };
 
     await redis.set(`kv:post:${slug}`, JSON.stringify(updated));

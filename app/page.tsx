@@ -1,37 +1,84 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { getAllPosts } from '@/lib/posts';
-import DancingBaby from './components/DancingBaby';
+import { getSettings } from '@/lib/settings';
+import PostsWithFilter from './components/PostsWithFilter';
+import ProfileSidebar from './components/ProfileSidebar';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const latestPosts = (await getAllPosts()).slice(0, 5);
+  const [latestPosts, settings] = await Promise.all([
+    getAllPosts().then((p) => p.slice(0, 10)),
+    getSettings(),
+  ]);
 
   return (
-    <main className="blog-container">
+    <main className="blog-container" style={{ paddingTop: '80px', paddingBottom: '96px' }}>
       <div className="page-layout">
 
         {/* ── 메인 ── */}
         <div className="main-col">
-          <div style={{ marginBottom: '28px' }}>
-            <Image
-              src="/pilsung.png"
-              alt="pilsung"
-              width={600}
-              height={124}
-              priority
+
+          {/* Hero section */}
+          <div style={{ marginBottom: '56px' }}>
+            <div
               style={{
-                width: '100%',
-                height: 'auto',
-                borderRadius: '4px',
-                display: 'block',
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                background: 'var(--pill-bg)',
+                fontSize: '0.72em',
+                fontWeight: 700,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'var(--pill-text)',
+                marginBottom: '20px',
               }}
-            />
+            >
+              블로그 아카이브
+            </div>
+
+            {/* DungGeunMo only here */}
+            <h1
+              style={{
+                fontFamily: "'DungGeunMo', monospace",
+                fontSize: '2.8em',
+                fontWeight: 800,
+                color: 'var(--text)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
+                marginBottom: '16px',
+              }}
+            >
+              certmin의{' '}
+              <span style={{ color: 'var(--primary)' }}>개발 일지</span>
+            </h1>
+
+            <p
+              style={{
+                fontSize: '1.05em',
+                color: 'var(--text-muted)',
+                lineHeight: 1.7,
+                maxWidth: '560px',
+              }}
+            >
+              {settings.siteSubtitle}
+            </p>
           </div>
 
+          {/* Section heading */}
           <div style={{ marginBottom: '24px' }}>
-            <span className="section-heading">최근 글</span>
+            <h2 className="section-heading">최근 글</h2>
+            <div
+              style={{
+                width: '40px',
+                height: '3px',
+                background: 'var(--primary-fixed)',
+                borderRadius: '9999px',
+                marginTop: '8px',
+              }}
+            />
           </div>
 
           {latestPosts.length === 0 ? (
@@ -39,20 +86,11 @@ export default async function Home() {
               <p>아직 작성된 글이 없습니다.</p>
             </div>
           ) : (
-            <ul className="post-list">
-              {latestPosts.map((post) => (
-                <li key={post.slug} className="post-list-item">
-                  <Link href={`/blog/${post.slug}`} className="post-list-title">
-                    {post.title}
-                  </Link>
-                  <div className="post-list-meta">{post.date}</div>
-                </li>
-              ))}
-            </ul>
+            <PostsWithFilter posts={latestPosts} />
           )}
 
           {latestPosts.length > 0 && (
-            <div style={{ marginTop: '12px' }}>
+            <div style={{ marginTop: '20px' }}>
               <Link href="/blog" className="btn">전체 글 보기 →</Link>
             </div>
           )}
@@ -60,24 +98,13 @@ export default async function Home() {
 
         {/* ── 사이드바 ── */}
         <div className="side-col">
-
-          <div className="sidebar-block">
-            <div className="sidebar-block-content" style={{ textAlign: 'center' }}>
-              <DancingBaby />
-            </div>
-          </div>
-
-          <div className="sidebar-block">
-            <div className="sidebar-block-title">소개</div>
-            <div className="sidebar-block-content">
-              <div className="sidebar-about">
-                <div>이름: 윤민규</div>
-                <div>취미: 코딩, 블로그</div>
-              </div>
-            </div>
-          </div>
-
+          <ProfileSidebar
+            profileName={settings.profileName}
+            profileDescription={settings.profileDescription}
+            profilePhoto={settings.profilePhoto}
+          />
         </div>
+
       </div>
     </main>
   );

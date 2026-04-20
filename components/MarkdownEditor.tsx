@@ -2,6 +2,9 @@
 
 import dynamic from 'next/dynamic';
 import { useRef } from 'react';
+import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
+import ReactMarkdown from 'react-markdown';
+import rehypeHighlight from 'rehype-highlight';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
@@ -47,7 +50,12 @@ export default function MarkdownEditor({ value, onChange, height = 600 }: Markdo
     <div
       data-color-mode="dark"
       onPaste={handlePaste}
-      style={{ border: '1px solid var(--border)', borderRadius: '4px' }}
+      style={{
+        border: '1px solid var(--border)',
+        borderRadius: '4px',
+        height: `${height}px`,
+        overflow: 'hidden',
+      }}
     >
       <input
         ref={fileInputRef}
@@ -60,27 +68,68 @@ export default function MarkdownEditor({ value, onChange, height = 600 }: Markdo
           e.target.value = '';
         }}
       />
-      <MDEditor
-        value={value}
-        onChange={(val) => onChange(val ?? '')}
-        height={height}
-        extraCommands={[
-          {
-            name: 'upload-image',
-            keyCommand: 'upload-image',
-            buttonProps: { 'aria-label': '이미지 업로드' },
-            icon: (
-              <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
-                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-                <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z" />
-              </svg>
-            ),
-            execute: () => {
-              fileInputRef.current?.click();
-            },
-          },
-        ]}
-      />
+      <PanelGroup orientation="horizontal" style={{ height: '100%' }}>
+        {/* 에디터 패널 */}
+        <Panel defaultSize={50} minSize={20}>
+          <div style={{ height: '100%', overflow: 'hidden' }}>
+            <MDEditor
+              value={value}
+              onChange={(val) => onChange(val ?? '')}
+              height={height}
+              preview="edit"
+              style={{ height: '100%' }}
+              extraCommands={[
+                {
+                  name: 'upload-image',
+                  keyCommand: 'upload-image',
+                  buttonProps: { 'aria-label': '이미지 업로드' },
+                  icon: (
+                    <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
+                      <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                      <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z" />
+                    </svg>
+                  ),
+                  execute: () => {
+                    fileInputRef.current?.click();
+                  },
+                },
+              ]}
+            />
+          </div>
+        </Panel>
+
+        {/* 드래그 핸들 */}
+        <PanelResizeHandle className="md-resize-handle" />
+
+        {/* 미리보기 패널 */}
+        <Panel defaultSize={50} minSize={20}>
+          <div
+            style={{
+              height: '100%',
+              overflow: 'auto',
+              padding: '16px 20px',
+              background: 'var(--surface)',
+              borderLeft: '1px solid var(--border)',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '0.75em',
+                color: 'var(--text-muted)',
+                marginBottom: '12px',
+                letterSpacing: '0.05em',
+              }}
+            >
+              미리보기
+            </div>
+            <div className="post-content">
+              <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                {value || '*내용을 입력하면 여기에 미리보기가 표시됩니다.*'}
+              </ReactMarkdown>
+            </div>
+          </div>
+        </Panel>
+      </PanelGroup>
     </div>
   );
 }

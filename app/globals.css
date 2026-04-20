@@ -435,3 +435,47 @@ a:visited {
     font-size: 1.3em;
   }
 }
+
+/* ===== MARKDOWN EDITOR RESIZE HANDLE ===== */
+[data-panel-resize-handle-id] {
+  transition: background 0.15s;
+}
+[data-panel-resize-handle-id]:hover,
+[data-resize-handle-active] {
+  background: var(--accent) !important;
+}
+[data-panel-resize-handle-id]:hover div,
+[data-resize-handle-active] div {
+  background: var(--bg) !important;
+}
+
+/* ===== MARKDOWN EDITOR RESIZE HANDLE ===== */
+.md-resize-handle {
+  width: 6px !important;
+  min-width: 6px !important;
+  background: var(--border);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  position: relative;
+}
+.md-resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 32px;
+  background: var(--text-muted);
+  border-radius: 1px;
+  transition: background 0.15s;
+}
+.md-resize-handle:hover,
+.md-resize-handle[data-resize-handle-state="drag"] {
+  background: var(--accent) !important;
+}
+.md-resize-handle:hover::after,
+.md-resize-handle[data-resize-handle-state="drag"]::after {
+  background: var(--bg);
+}

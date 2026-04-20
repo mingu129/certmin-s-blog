@@ -71,7 +71,7 @@ export default function AdminEditPage({ params }: { params: Promise<{ slug: stri
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '100vh', padding: '0 24px' }}>
+    <div style={{ minHeight: '100vh', padding: '0 24px' }}>
       {/* Sticky 상단 바 */}
       <div style={{
         position: 'sticky',

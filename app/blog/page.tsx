@@ -18,8 +18,13 @@ function getExcerpt(content: string, maxLen = 120): string {
   return plain.length > maxLen ? plain.slice(0, maxLen) + '...' : plain;
 }
 
-export default async function BlogPage() {
-  const posts = await getAllPosts();
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tag?: string }>;
+}) {
+  const [posts, { tag: rawTag }] = await Promise.all([getAllPosts(), searchParams]);
+  const initialTag = rawTag ? decodeURIComponent(rawTag) : null;
 
   const postItems = posts.map((p) => ({
     slug: p.slug,
@@ -72,7 +77,7 @@ export default async function BlogPage() {
           <p>아직 작성된 글이 없습니다.</p>
         </div>
       ) : (
-        <BlogPostList posts={postItems} />
+        <BlogPostList key={initialTag ?? 'all'} posts={postItems} initialTag={initialTag} />
       )}
 
       <div style={{ marginTop: '32px' }}>

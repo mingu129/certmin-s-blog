@@ -81,7 +81,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 {tags.map((tag) => (
                   <Link
                     key={tag}
-                    href={`/?tag=${encodeURIComponent(tag)}`}
+                    href={`/blog?tag=${encodeURIComponent(tag)}`}
                     className="hashtag-inline"
                   >
                     #{tag}
@@ -108,7 +108,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               {tags.map((tag) => (
                 <Link
                   key={tag}
-                  href={`/?tag=${encodeURIComponent(tag)}`}
+                  href={`/blog?tag=${encodeURIComponent(tag)}`}
                   className="category-tag"
                   style={{ textDecoration: 'none' }}
                 >
@@ -249,7 +249,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               {tags.map((tag) => (
                 <Link
                   key={tag}
-                  href={`/?tag=${encodeURIComponent(tag)}`}
+                  href={`/blog?tag=${encodeURIComponent(tag)}`}
                   className="hashtag-inline"
                   style={{ textDecoration: 'none' }}
                 >

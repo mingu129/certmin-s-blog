@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server';
-import { redis } from '@/lib/redis';
 import crypto from 'crypto';
+import fs from 'fs/promises';
+import path from 'path';
+
+const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
+
+const MIME_TO_EXT: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg',
+  'image/png': 'png',
+  'image/gif': 'gif',
+  'image/webp': 'webp',
+  'image/svg+xml': 'svg',
+};
 
 function verifyToken(token: string): boolean {
   const password = process.env.ADMIN_PASSWORD;
@@ -29,14 +41,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '파일이 없습니다.' }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const base64 = buffer.toString('base64');
     const mimeType = file.type || 'image/png';
-
+    const ext = MIME_TO_EXT[mimeType] ?? 'png';
     const id = `img-${Date.now()}`;
-    await redis.set(`kv:image:${id}`, JSON.stringify({ data: base64, mimeType }));
+    const filename = `${id}.${ext}`;
 
-    return NextResponse.json({ url: `/api/images/${id}` });
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await fs.mkdir(UPLOADS_DIR, { recursive: true });
+    await fs.writeFile(path.join(UPLOADS_DIR, filename), buffer);
+
+    return NextResponse.json({ url: `/uploads/${filename}` });
   } catch (err) {
     console.error('[POST /api/admin/upload]', err);
     return NextResponse.json(

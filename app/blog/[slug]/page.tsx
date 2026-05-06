@@ -23,7 +23,7 @@ function extractHeadings(content: string): TocHeading[] {
   const result: TocHeading[] = [];
   const idCount: Record<string, number> = {};
   for (const line of content.split('\n')) {
-    const m = line.match(/^(#)\s+(.+)$/);
+    const m = line.match(/^(#{1,2})\s+(.+)$/);
     if (!m) continue;
     const level = m[1].length;
     const text = m[2].trim().replace(/`([^`]+)`/g, '$1').replace(/\*\*?([^*]+)\*\*?/g, '$1');

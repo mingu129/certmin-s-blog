@@ -6,7 +6,7 @@ import PilsungHero from './components/PilsungHero';
 
 export const dynamic = 'force-dynamic';
 
-const DISCHARGE_DATE = new Date('2026-12-01T00:00:00+09:00');
+const DISCHARGE_DATE = new Date('2026-12-20T00:00:00+09:00');
 
 function daysUntilDischarge(): number {
   const now = new Date();
@@ -45,8 +45,8 @@ export default async function Home() {
             marginBottom: '14px',
           }}
         >
-          certmin의{' '}
-          <span style={{ color: 'var(--primary)' }}>개발 일지</span>
+          certmin's{' '}
+          <span style={{ color: 'var(--primary)' }} className="glitch-title">PILSUNG BLOG</span>
         </h1>
 
         <p

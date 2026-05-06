@@ -44,7 +44,9 @@ export default function PilsungHero() {
         priority
         unoptimized
         style={{ objectFit: 'cover' }}
+        className="crt-flicker"
       />
+      <div className="scanline-overlay" />
     </div>
   );
 }

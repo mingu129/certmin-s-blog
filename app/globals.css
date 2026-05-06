@@ -102,6 +102,50 @@
 
 html { scroll-behavior: smooth; }
 
+/* ===== PSX HORROR: FILM GRAIN ===== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  opacity: 0.038;
+  pointer-events: none;
+  z-index: 9000;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  animation: grain-shift 0.45s steps(1) infinite;
+}
+
+@keyframes grain-shift {
+  0%   { transform: translate(0, 0); }
+  12%  { transform: translate(-6%, -8%); }
+  25%  { transform: translate(-12%, 6%); }
+  37%  { transform: translate(8%, -20%); }
+  50%  { transform: translate(-4%, 22%); }
+  62%  { transform: translate(-14%, 8%); }
+  75%  { transform: translate(12%, -4%); }
+  87%  { transform: translate(2%, 14%); }
+  100% { transform: translate(-6%, -6%); }
+}
+
+/* ===== PSX HORROR: VIGNETTE ===== */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8999;
+  background: radial-gradient(
+    ellipse 85% 80% at 50% 40%,
+    transparent 48%,
+    rgba(0, 0, 0, 0.48) 100%
+  );
+}
+
+[data-theme="light"] body::before { opacity: 0.016; }
+[data-theme="light"] body::after  { opacity: 0; }
+
 body {
   background-color: var(--bg);
   font-family: var(--font-manrope, 'Manrope'), sans-serif;
@@ -162,6 +206,67 @@ a:visited {
 }
 .theme-toggle .material-symbols-outlined {
   font-size: 20px;
+}
+
+/* ===== PSX HORROR: SCANLINE OVERLAY ===== */
+.scanline-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.07) 3px,
+    rgba(0, 0, 0, 0.07) 4px
+  );
+}
+
+/* ===== PSX HORROR: GLITCH ANIMATION ===== */
+@keyframes glitch-text {
+  0%, 87%, 100% {
+    text-shadow: none;
+    transform: none;
+    clip-path: none;
+  }
+  88% {
+    text-shadow: 3px 0 #ff0033, -3px 0 #00ccff;
+    transform: skewX(-3deg);
+  }
+  89% {
+    text-shadow: -2px 0 #ff0033, 2px 0 #00ccff;
+    transform: translateX(3px) skewX(2deg);
+    clip-path: inset(10% 0 65% 0);
+  }
+  90% {
+    clip-path: inset(55% 0 15% 0);
+    transform: translateX(-3px);
+    text-shadow: 2px 0 #ff0033;
+  }
+  91% {
+    clip-path: none;
+    transform: skewX(1deg);
+    text-shadow: none;
+  }
+  92% { transform: none; }
+}
+
+.glitch-title {
+  display: inline;
+  animation: glitch-text 9s ease-in-out infinite;
+}
+
+/* ===== PSX HORROR: CRT FLICKER ===== */
+@keyframes crt-flicker {
+  0%, 96%, 100% { opacity: 1; filter: brightness(1); }
+  97%            { opacity: 0.93; filter: brightness(0.88); }
+  98%            { opacity: 1; filter: brightness(1.04); }
+  99%            { opacity: 0.96; filter: brightness(0.94); }
+}
+
+.crt-flicker {
+  animation: crt-flicker 7s ease-in-out infinite;
 }
 
 /* ===== LAYOUT ===== */
@@ -273,11 +378,14 @@ a:visited {
   border-radius: 0.75rem;
   padding: 20px 24px;
   margin-bottom: 10px;
-  transition: background 0.2s;
+  border: 1px solid var(--border-ghost);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .post-list-item:hover {
   background: var(--surface-high);
+  border-color: var(--primary-fixed);
+  box-shadow: 0 0 18px rgba(90, 122, 248, 0.13), 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
 .post-list-title {
@@ -308,6 +416,7 @@ a:visited {
   color: var(--text);
   letter-spacing: -0.03em;
   display: inline-block;
+  text-shadow: 0 0 28px rgba(90, 122, 248, 0.45), 0 0 8px rgba(90, 122, 248, 0.2);
 }
 
 /* ===== BLOG POST PAGE ===== */
@@ -510,12 +619,14 @@ a:visited {
   border-radius: 0.75rem;
   overflow: hidden;
   text-decoration: none;
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--border-ghost);
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 .blog-card:hover {
   background: var(--surface-container);
   transform: translateY(-3px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+  border-color: var(--primary-fixed);
+  box-shadow: 0 0 20px rgba(90, 122, 248, 0.15), 0 8px 32px rgba(0, 0, 0, 0.22);
   text-decoration: none;
 }
 .blog-card:visited {

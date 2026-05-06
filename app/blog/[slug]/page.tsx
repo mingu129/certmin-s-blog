@@ -5,6 +5,50 @@ import { getPostGradient } from '@/lib/thumbnail';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
+import type { ReactNode } from 'react';
+import TableOfContents, { type TocHeading } from '@/app/components/TableOfContents';
+
+function slugify(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\*\*?([^*]+)\*\*?/g, '$1')
+    .replace(/[^\w\s가-힣]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+function extractHeadings(content: string): TocHeading[] {
+  const result: TocHeading[] = [];
+  const idCount: Record<string, number> = {};
+  for (const line of content.split('\n')) {
+    const m = line.match(/^(#{1,3})\s+(.+)$/);
+    if (!m) continue;
+    const level = m[1].length;
+    const text = m[2].trim().replace(/`([^`]+)`/g, '$1').replace(/\*\*?([^*]+)\*\*?/g, '$1');
+    let id = slugify(m[2]);
+    idCount[id] = (idCount[id] ?? 0) + 1;
+    if (idCount[id] > 1) id = `${id}-${idCount[id]}`;
+    result.push({ level, text, id });
+  }
+  return result;
+}
+
+function nodeToText(node: ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(nodeToText).join('');
+  if (node !== null && typeof node === 'object' && 'props' in node)
+    return nodeToText((node as { props: { children?: ReactNode } }).props.children);
+  return '';
+}
+
+function makeHeadingId(children: ReactNode, counts: Record<string, number>): string {
+  let id = slugify(nodeToText(children));
+  counts[id] = (counts[id] ?? 0) + 1;
+  if (counts[id] > 1) id = `${id}-${counts[id]}`;
+  return id;
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +61,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   }
 
   const tags = post.tags ?? [];
+  const headings = extractHeadings(post.content);
 
   return (
     <main className="blog-container" style={{ paddingTop: '80px', paddingBottom: '96px' }}>
@@ -56,12 +101,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           >
             Post Overview
           </div>
-          <nav>
-            <a className="sidebar-toc-link active" href="#post-top">
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>subject</span>
-              시작
-            </a>
-          </nav>
+          <TableOfContents headings={headings} />
 
           {tags.length > 0 && (
             <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--border-faint)' }}>
@@ -222,10 +262,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           <div className="post-content">
             <ReactMarkdown
               rehypePlugins={[rehypeHighlight]}
-              components={{
-                h1: ({ children }) => <h1>{children}</h1>,
-                h2: ({ children }) => <h2>{children}</h2>,
-                h3: ({ children }) => <h3>{children}</h3>,
+              components={(() => {
+                const hCounts: Record<string, number> = {};
+                return {
+                h1: ({ children }) => { const id = makeHeadingId(children, hCounts); return <h1 id={id} data-heading-id={id}>{children}</h1>; },
+                h2: ({ children }) => { const id = makeHeadingId(children, hCounts); return <h2 id={id} data-heading-id={id}>{children}</h2>; },
+                h3: ({ children }) => { const id = makeHeadingId(children, hCounts); return <h3 id={id} data-heading-id={id}>{children}</h3>; },
                 p:  ({ children }) => <p>{children}</p>,
                 ul: ({ children }) => <ul>{children}</ul>,
                 ol: ({ children }) => <ol>{children}</ol>,
@@ -237,7 +279,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 blockquote: ({ children }) => <blockquote>{children}</blockquote>,
                 a: ({ href, children }) => <a href={href}>{children}</a>,
                 hr: () => <hr />,
-              }}
+              }; })()}
             >
               {post.content}
             </ReactMarkdown>

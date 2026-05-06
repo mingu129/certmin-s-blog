@@ -38,7 +38,7 @@ export default function PilsungHero() {
       title=""
     >
       <Image
-        src="/pilsung.png"
+        src="/pilsung2.png"
         alt="certmin hero"
         fill
         priority

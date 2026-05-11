@@ -1,7 +1,3 @@
-'use client';
-
-import { useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -12,26 +8,6 @@ interface Props {
 }
 
 export default function ProfileSidebar({ profileName, profileDescription, profilePhoto }: Props) {
-  const router = useRouter();
-  const clickCount = useRef(0);
-  const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  function handleProfileClick() {
-    clickCount.current += 1;
-
-    if (clickTimer.current) clearTimeout(clickTimer.current);
-
-    if (clickCount.current >= 5) {
-      clickCount.current = 0;
-      router.push('/admin');
-      return;
-    }
-
-    clickTimer.current = setTimeout(() => {
-      clickCount.current = 0;
-    }, 1500);
-  }
-
   return (
     <>
       {/* Profile block */}
@@ -39,47 +15,22 @@ export default function ProfileSidebar({ profileName, profileDescription, profil
         <div className="sidebar-block-title">소개</div>
         <div className="sidebar-about">
           <div
-            onClick={handleProfileClick}
             style={{
-              width: '52px',
-              height: '52px',
-              borderRadius: '50%',
-              background: 'var(--surface-high)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px',
-              cursor: 'pointer',
-              overflow: 'hidden',
-              border: '2px solid var(--accent-soft-hover)',
-              transition: 'border-color 0.2s',
-              userSelect: 'none',
-              flexShrink: 0,
+              width: '88px', height: '88px', borderRadius: '50%',
+              background: 'var(--surface-high)', display: 'flex',
+              alignItems: 'center', justifyContent: 'center',
+              marginBottom: '16px', overflow: 'hidden',
+              border: '2px solid var(--accent-soft-hover)', flexShrink: 0,
             }}
-            title=""
           >
             {profilePhoto ? (
-              <Image
-                src={profilePhoto}
-                alt={profileName}
-                width={52}
-                height={52}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                unoptimized
-              />
+              <Image src={profilePhoto} alt={profileName} width={88} height={88} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized />
             ) : (
-              <span className="material-symbols-outlined" style={{ color: 'var(--primary-fixed)', fontSize: '24px' }}>
-                person
-              </span>
+              <span className="material-symbols-outlined" style={{ color: 'var(--primary-fixed)', fontSize: '36px' }}>person</span>
             )}
           </div>
-
-          <div style={{ fontWeight: 700, color: 'var(--text)', marginBottom: '8px' }}>
-            {profileName}
-          </div>
-          <div style={{ fontSize: '0.88em', color: 'var(--text-muted)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-            {profileDescription}
-          </div>
+          <div style={{ fontWeight: 700, color: 'var(--text)', marginBottom: '8px' }}>{profileName}</div>
+          <div style={{ fontSize: '0.88em', color: 'var(--text-muted)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>{profileDescription}</div>
         </div>
       </div>
 
@@ -87,21 +38,11 @@ export default function ProfileSidebar({ profileName, profileDescription, profil
       <div className="sidebar-block">
         <div className="sidebar-block-title">링크</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <Link
-            href="/blog"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85em', color: 'var(--text-muted)', textDecoration: 'none' }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>article</span>
-            글 목록
+          <Link href="/blog" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85em', color: 'var(--text-muted)', textDecoration: 'none' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>article</span>글 목록
           </Link>
-          <a
-            href="https://github.com/mingu129"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85em', color: 'var(--text-muted)', textDecoration: 'none' }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>code</span>
-            GitHub
+          <a href="https://github.com/mingu129" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85em', color: 'var(--text-muted)', textDecoration: 'none' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>code</span>GitHub
           </a>
         </div>
       </div>

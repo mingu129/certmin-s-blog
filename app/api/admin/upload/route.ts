@@ -11,35 +11,29 @@ const MIME_TO_EXT: Record<string, string> = {
   'image/png': 'png',
   'image/gif': 'gif',
   'image/webp': 'webp',
-  'image/svg+xml': 'svg',
 };
 
 function verifyToken(token: string): boolean {
   const password = process.env.ADMIN_PASSWORD;
   if (!password) return false;
-  const expected = crypto
-    .createHmac('sha256', password)
-    .update('admin-session')
-    .digest('hex');
+  const expected = crypto.createHmac('sha256', password).update('admin-session').digest('hex');
   return token === expected;
+}
+
+function getToken(request: Request) {
+  const cookieHeader = request.headers.get('cookie') || '';
+  const match = cookieHeader.match(/admin_token=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : '';
 }
 
 export async function POST(request: Request) {
   try {
-    const cookieHeader = request.headers.get('cookie') || '';
-    const tokenMatch = cookieHeader.match(/admin_token=([^;]+)/);
-    const token = tokenMatch ? decodeURIComponent(tokenMatch[1]) : '';
-
-    if (!verifyToken(token)) {
+    if (!verifyToken(getToken(request)))
       return NextResponse.json({ error: '인증 실패. 다시 로그인해주세요.' }, { status: 401 });
-    }
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-
-    if (!file) {
-      return NextResponse.json({ error: '파일이 없습니다.' }, { status: 400 });
-    }
+    if (!file) return NextResponse.json({ error: '파일이 없습니다.' }, { status: 400 });
 
     const mimeType = file.type || 'image/png';
     const ext = MIME_TO_EXT[mimeType] ?? 'png';
@@ -53,9 +47,34 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: `/uploads/${filename}` });
   } catch (err) {
     console.error('[POST /api/admin/upload]', err);
-    return NextResponse.json(
-      { error: `서버 오류: ${err instanceof Error ? err.message : String(err)}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: `서버 오류: ${err instanceof Error ? err.message : String(err)}` }, { status: 500 });
+  }
+}
+
+// Delete orphaned images (uploaded but not saved with a post)
+export async function DELETE(request: Request) {
+  try {
+    if (!verifyToken(getToken(request)))
+      return NextResponse.json({ error: '인증 실패.' }, { status: 401 });
+
+    const { urls } = await request.json() as { urls: string[] };
+    if (!Array.isArray(urls)) return NextResponse.json({ error: 'urls 배열 필요' }, { status: 400 });
+
+    const deleted: string[] = [];
+    for (const url of urls) {
+      // Only delete files in /uploads/ with expected pattern (safety check)
+      const match = url.match(/^\/uploads\/(img-\d+\.\w+)$/);
+      if (!match) continue;
+      const filepath = path.join(UPLOADS_DIR, match[1]);
+      try {
+        await fs.unlink(filepath);
+        deleted.push(url);
+      } catch {
+        // File may already be gone — ignore
+      }
+    }
+    return NextResponse.json({ deleted });
+  } catch (err) {
+    return NextResponse.json({ error: `서버 오류: ${err instanceof Error ? err.message : String(err)}` }, { status: 500 });
   }
 }

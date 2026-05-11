@@ -1,19 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import ThemeToggle from "./components/ThemeToggle";
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
-  display: "swap",
-  weight: ["200", "300", "400", "500", "600", "700", "800"],
-});
+import HiddenAdminTrigger from "./components/HiddenAdminTrigger";
 
 export const metadata: Metadata = {
   title: "certmin",
-  description: "일상과 생각을 기록하는 개인 블로그",
+  description: "기록용 개인 블로그",
 };
 
 export const viewport: Viewport = {
@@ -29,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={manrope.variable} data-theme="dark" suppressHydrationWarning>
+    <html lang="ko" data-theme="dark" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <link
@@ -59,7 +52,7 @@ export default function RootLayout({
               padding: "16px 32px",
               maxWidth: "1280px",
               margin: "0 auto",
-              fontFamily: "var(--font-manrope, Manrope), sans-serif",
+              fontFamily: "'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
@@ -92,6 +85,7 @@ export default function RootLayout({
           </nav>
         </header>
 
+        <HiddenAdminTrigger />
         {/* Page content offset for fixed nav */}
         <div style={{ paddingTop: "72px" }}>{children}</div>
 
@@ -119,7 +113,7 @@ export default function RootLayout({
                 fontSize: "0.9em",
               }}
             >
-              © 2026 certmin. Built for the archive.
+              © 2026 certmin. Built for the archive maybe?
             </span>
             <div style={{ display: "flex", gap: "24px" }}>
               <a

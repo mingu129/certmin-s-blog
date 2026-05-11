@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAllPosts } from '@/lib/posts';
+import { getSettings } from '@/lib/settings';
 import { getPostGradient } from '@/lib/thumbnail';
 import PilsungHero from './components/PilsungHero';
+import ProfileSidebar from './components/ProfileSidebar';
+import DancingBaby from './components/DancingBaby';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +18,7 @@ function daysUntilDischarge(): number {
 }
 
 export default async function Home() {
-  const posts = await getAllPosts();
+  const [posts, settings] = await Promise.all([getAllPosts(), getSettings()]);
   const latestPosts = posts.slice(0, 5);
   const daysLeft = daysUntilDischarge();
 
@@ -26,185 +29,207 @@ export default async function Home() {
   const tags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
 
   return (
-    <main className="blog-container" style={{ paddingTop: '40px', paddingBottom: '96px', maxWidth: '960px' }}>
-      {/* Hero image */}
-      <div style={{ marginBottom: '36px' }}>
+    <main className="blog-container" style={{ paddingTop: '40px', paddingBottom: '96px' }}>
+      {/* Hero - full width */}
+      <div style={{ marginBottom: '40px' }}>
         <PilsungHero />
       </div>
 
-      {/* Title + stats */}
-      <div style={{ marginBottom: '64px' }}>
-        <h1
-          style={{
-            fontFamily: "'DungGeunMo', monospace",
-            fontSize: '2.8em',
-            fontWeight: 800,
-            color: 'var(--text)',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.15,
-            marginBottom: '14px',
-          }}
-        >
-          certmin's{' '}
-          <span style={{ color: 'var(--primary)' }} className="glitch-title">PILSUNG BLOG</span>
-        </h1>
+      {/* Two-column layout */}
+      <div className="page-layout">
 
-        <p
-          style={{
-            fontSize: '1em',
-            color: 'var(--text-muted)',
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {daysLeft > 0 ? (
-            <>
-              전역까지 <strong style={{ color: 'var(--primary-fixed)' }}>{daysLeft}일</strong>
-              <span style={{ margin: '0 10px', opacity: 0.4 }}>·</span>
-              글 <strong style={{ color: 'var(--text)' }}>{posts.length}개</strong>
-            </>
-          ) : (
-            <>
-              전역 완료 <span style={{ margin: '0 10px', opacity: 0.4 }}>·</span>
-              글 <strong style={{ color: 'var(--text)' }}>{posts.length}개</strong>
-            </>
-          )}
-        </p>
-      </div>
-
-      {/* Recent posts */}
-      <section style={{ marginBottom: '64px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '24px' }}>
-          <div>
-            <h2 className="section-heading">최근 글</h2>
-            <div
-              style={{
-                width: '40px',
-                height: '3px',
-                background: 'var(--primary-fixed)',
-                borderRadius: '9999px',
-                marginTop: '8px',
-              }}
+        {/* ── Left sidebar ── */}
+        <aside className="side-col">
+          <div style={{ position: 'sticky', top: '96px', display: 'flex', flexDirection: 'column', gap: '0' }}>
+            <ProfileSidebar
+              profileName={settings.profileName}
+              profileDescription={settings.profileDescription}
+              profilePhoto={settings.profilePhoto}
             />
+            <div style={{ padding: '0' }}>
+              <DancingBaby />
+            </div>
           </div>
-          {posts.length > 5 && (
-            <Link
-              href="/blog"
+        </aside>
+
+        {/* ── Right main content ── */}
+        <div className="main-col">
+
+          {/* Title + stats */}
+          <div style={{ marginBottom: '56px' }}>
+            <h1
               style={{
-                fontSize: '0.85em',
-                color: 'var(--text-muted)',
-                textDecoration: 'none',
-                letterSpacing: '-0.01em',
+                fontFamily: "'DungGeunMo', monospace",
+                fontSize: '2.6em',
+                fontWeight: 800,
+                color: 'var(--text)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
+                marginBottom: '12px',
               }}
             >
-              더 보기 →
-            </Link>
-          )}
-        </div>
+              certmin's{' '}
+              <span style={{ color: 'var(--primary)' }} className="glitch-title">PILSUNG BLOG</span>
+            </h1>
 
-        {latestPosts.length === 0 ? (
-          <div className="empty-state">
-            <p>아직 작성된 글이 없습니다.</p>
-          </div>
-        ) : (
-          <ul className="post-list" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {latestPosts.map((post) => (
-              <li key={post.slug} className="post-list-item" style={{ marginBottom: '10px' }}>
-                <Link
-                  href={`/blog/${post.slug}`}
-                  style={{ display: 'flex', gap: '16px', alignItems: 'center', textDecoration: 'none' }}
-                >
-                  <div
-                    style={{
-                      width: '120px',
-                      height: '67px',
-                      borderRadius: '0.45rem',
-                      overflow: 'hidden',
-                      flexShrink: 0,
-                      background: post.thumbnail ? 'var(--surface-high)' : getPostGradient(post.slug),
-                      position: 'relative',
-                    }}
-                  >
-                    {post.thumbnail ? (
-                      <Image
-                        src={post.thumbnail}
-                        alt={post.title}
-                        fill
-                        style={{ objectFit: 'cover' }}
-                        unoptimized
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          opacity: 0.3,
-                        }}
-                      >
-                        <span className="material-symbols-outlined" style={{ fontSize: '22px', color: '#fff' }}>article</span>
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <span className="post-list-title" style={{ display: 'block', marginBottom: '6px' }}>
-                      {post.title}
-                    </span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                      <span className="post-list-meta">{post.date}</span>
-                      {(post.tags ?? []).map((tag) => (
-                        <span key={tag} className="hashtag-inline">#{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+            {settings.siteSubtitle && (
+              <p style={{ fontSize: '0.95em', color: 'var(--text-muted)', marginBottom: '10px', letterSpacing: '-0.01em' }}>
+                {settings.siteSubtitle}
+              </p>
+            )}
 
-      {/* Tag section */}
-      {tags.length > 0 && (
-        <section>
-          <div style={{ marginBottom: '24px' }}>
-            <h2 className="section-heading">태그</h2>
-            <div
-              style={{
-                width: '40px',
-                height: '3px',
-                background: 'var(--primary-fixed)',
-                borderRadius: '9999px',
-                marginTop: '8px',
-              }}
-            />
+            <p style={{ fontSize: '0.9em', color: 'var(--text-muted)', letterSpacing: '-0.01em' }}>
+              {daysLeft > 0 ? (
+                <>
+                  전역까지 <strong style={{ color: 'var(--primary-fixed)' }}>{daysLeft}일</strong>
+                  <span style={{ margin: '0 10px', opacity: 0.4 }}>·</span>
+                  글 <strong style={{ color: 'var(--text)' }}>{posts.length}개</strong>
+                </>
+              ) : (
+                <>
+                  전역 완료 <span style={{ margin: '0 10px', opacity: 0.4 }}>·</span>
+                  글 <strong style={{ color: 'var(--text)' }}>{posts.length}개</strong>
+                </>
+              )}
+            </p>
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {tags.map(([tag, count]) => (
-              <Link
-                key={tag}
-                href={`/blog?tag=${encodeURIComponent(tag)}`}
-                className="tag-pill"
-                style={{ textDecoration: 'none' }}
-              >
-                #{tag}
-                <span
+          {/* Recent posts */}
+          <section style={{ marginBottom: '64px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '24px' }}>
+              <div>
+                <h2 className="section-heading">최근 글</h2>
+                <div
                   style={{
-                    marginLeft: '5px',
-                    fontSize: '0.82em',
-                    fontWeight: 400,
-                    opacity: 0.5,
+                    width: '40px',
+                    height: '3px',
+                    background: 'var(--primary-fixed)',
+                    borderRadius: '9999px',
+                    marginTop: '8px',
+                  }}
+                />
+              </div>
+              {posts.length > 5 && (
+                <Link
+                  href="/blog"
+                  style={{
+                    fontSize: '0.85em',
+                    color: 'var(--text-muted)',
+                    textDecoration: 'none',
+                    letterSpacing: '-0.01em',
                   }}
                 >
-                  {count}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+                  더 보기 →
+                </Link>
+              )}
+            </div>
+
+            {latestPosts.length === 0 ? (
+              <div className="empty-state">
+                <p>아직 작성된 글이 없습니다.</p>
+              </div>
+            ) : (
+              <ul className="post-list" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {latestPosts.map((post) => (
+                  <li key={post.slug} className="post-list-item" style={{ marginBottom: '10px' }}>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      style={{ display: 'flex', gap: '16px', alignItems: 'center', textDecoration: 'none' }}
+                    >
+                      <div
+                        style={{
+                          width: '120px',
+                          height: '67px',
+                          borderRadius: '0.45rem',
+                          overflow: 'hidden',
+                          flexShrink: 0,
+                          background: post.thumbnail ? 'var(--surface-high)' : getPostGradient(post.slug),
+                          position: 'relative',
+                        }}
+                      >
+                        {post.thumbnail ? (
+                          <Image
+                            src={post.thumbnail}
+                            alt={post.title}
+                            fill
+                            style={{ objectFit: 'cover' }}
+                            unoptimized
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              opacity: 0.3,
+                            }}
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: '22px', color: '#fff' }}>article</span>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <span className="post-list-title" style={{ display: 'block', marginBottom: '6px' }}>
+                          {post.title}
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <span className="post-list-meta">{post.date}</span>
+                          {(post.tags ?? []).map((tag) => (
+                            <span key={tag} className="hashtag-inline">#{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* Tags */}
+          {tags.length > 0 && (
+            <section>
+              <div style={{ marginBottom: '24px' }}>
+                <h2 className="section-heading">태그</h2>
+                <div
+                  style={{
+                    width: '40px',
+                    height: '3px',
+                    background: 'var(--primary-fixed)',
+                    borderRadius: '9999px',
+                    marginTop: '8px',
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {tags.map(([tag, count]) => (
+                  <Link
+                    key={tag}
+                    href={`/blog?tag=${encodeURIComponent(tag)}`}
+                    className="tag-pill"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    #{tag}
+                    <span
+                      style={{
+                        marginLeft: '5px',
+                        fontSize: '0.82em',
+                        fontWeight: 400,
+                        opacity: 0.5,
+                      }}
+                    >
+                      {count}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
     </main>
   );
 }

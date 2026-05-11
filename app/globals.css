@@ -13,6 +13,14 @@
 .hljs-link { text-decoration: underline; }
 
 @font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'DungGeunMo';
   src: url('/fonts/DungGeunMo.woff2') format('woff2'),
        url('/fonts/DungGeunMo.woff') format('woff');
@@ -146,9 +154,27 @@ body::after {
 [data-theme="light"] body::before { opacity: 0.016; }
 [data-theme="light"] body::after  { opacity: 0; }
 
+[data-theme="light"] .post-content code {
+  background: rgba(27, 31, 35, 0.06);
+  color: #d63384;
+  border: 1px solid rgba(27, 31, 35, 0.1);
+}
+
+[data-theme="light"] .post-content pre {
+  background: #282c34;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+  border: none;
+}
+
+[data-theme="light"] .post-content pre code {
+  background: transparent;
+  color: inherit;
+  border: none;
+}
+
 body {
   background-color: var(--bg);
-  font-family: var(--font-manrope, 'Manrope'), sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--text);
   min-height: 100vh;
   line-height: 1.7;
@@ -326,6 +352,12 @@ a:visited {
   padding: 24px;
   position: sticky;
   top: 96px;
+}
+
+/* Inside a side-col wrapper (homepage), sticky is handled by the parent */
+.side-col .sidebar-block {
+  position: relative;
+  top: auto;
 }
 
 .sidebar-block-title {

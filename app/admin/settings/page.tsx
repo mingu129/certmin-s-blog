@@ -32,6 +32,10 @@ export default function AdminSettingsPage() {
   }, []);
 
   async function handlePhotoUpload(file: File) {
+    if (file.size > 10 * 1024 * 1024) {
+      setError('파일 크기는 10MB 이하여야 합니다.');
+      return;
+    }
     setPhotoLoading(true);
     try {
       const formData = new FormData();
@@ -166,7 +170,7 @@ export default function AdminSettingsPage() {
                 )}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <input ref={photoInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+                <input ref={photoInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" style={{ display: 'none' }}
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); e.target.value = ''; }}
                 />
                 <button
@@ -177,6 +181,7 @@ export default function AdminSettingsPage() {
                   <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>{photoLoading ? 'hourglass_empty' : 'upload'}</span>
                   {photoLoading ? '업로드 중...' : '사진 업로드'}
                 </button>
+                <span style={{ fontSize: '0.72em', color: 'var(--text-muted)', opacity: 0.7 }}>JPG · PNG · GIF · WebP (최대 10MB)</span>
                 {profilePhoto && (
                   <button onClick={() => setProfilePhoto('')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'none', border: 'none', color: 'var(--error)', fontSize: '0.78em', fontFamily: 'inherit', cursor: 'pointer' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>delete</span>

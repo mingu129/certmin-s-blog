@@ -5,6 +5,7 @@ import { getPostGradient } from '@/lib/thumbnail';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
+import remarkGfm from 'remark-gfm';
 import type { ReactNode } from 'react';
 import TableOfContents, { type TocHeading } from '@/app/components/TableOfContents';
 
@@ -261,7 +262,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           {/* Content */}
           <div className="post-content">
             <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeHighlight]}
+              urlTransform={(url) => url}
               components={(() => {
                 const hCounts: Record<string, number> = {};
                 return {
@@ -281,7 +284,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 hr: () => <hr />,
               }; })()}
             >
-              {post.content}
+              {post.content.replace(/<!--[\s\S]*?-->/g, '')}
             </ReactMarkdown>
           </div>
 

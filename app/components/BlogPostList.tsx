@@ -205,10 +205,12 @@ function CardItem({ post }: { post: PostListItem }) {
   return (
     <Link href={`/blog/${post.slug}`} className="blog-card">
       <div
+        className="post-thumb"
         style={{
           position: 'relative',
           width: '100%',
           aspectRatio: '16/9',
+          overflow: 'hidden',
           background: post.thumbnail ? 'var(--surface-high)' : getPostGradient(post.slug),
         }}
       >
@@ -295,17 +297,10 @@ function CardItem({ post }: { post: PostListItem }) {
 /* ── List view item ── */
 function ListRow({ post, onTagClick }: { post: PostListItem; onTagClick: (tag: string) => void }) {
   return (
-    <Link
-      href={`/blog/${post.slug}`}
-      style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', textDecoration: 'none' }}
-    >
+    <Link href={`/blog/${post.slug}`} className="list-row-link">
       <div
+        className="post-thumb list-thumb"
         style={{
-          width: '160px',
-          height: '90px',
-          borderRadius: '0.5rem',
-          overflow: 'hidden',
-          flexShrink: 0,
           background: post.thumbnail ? 'var(--surface-high)' : getPostGradient(post.slug),
           position: 'relative',
         }}

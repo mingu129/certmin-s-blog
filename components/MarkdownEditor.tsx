@@ -5,6 +5,7 @@ import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'reac
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
+import CodeBlock from '@/app/components/CodeBlock';
 
 interface MarkdownEditorProps {
   value: string;
@@ -347,7 +348,7 @@ export default function MarkdownEditor({ value, onChange, height = 600, onImageU
               미리보기
             </div>
             <div className="post-content">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]} urlTransform={(url) => url}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]} urlTransform={(url) => url} components={{ pre: ({ children }) => <CodeBlock>{children}</CodeBlock> }}>
                 {value.replace(/<!--[\s\S]*?-->/g, '') || '*내용을 입력하면 여기에 미리보기가 표시됩니다.*'}
               </ReactMarkdown>
             </div>

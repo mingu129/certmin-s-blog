@@ -72,7 +72,9 @@
       "Read(//etc/nginx/conf.d/**)",
       "Bash(redis-cli CONFIG GET bind)",
       "Bash(redis-cli CONFIG GET requirepass)",
-      "Bash(npm list *)"
+      "Bash(npm list *)",
+      "Bash(python3 *)",
+      "Bash(convert --version)"
     ]
   }
 }

@@ -44,18 +44,8 @@ export default function RootLayout({
             borderBottom: "1px solid var(--border-subtle)",
           }}
         >
-          <nav
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "16px 32px",
-              maxWidth: "1280px",
-              margin: "0 auto",
-              fontFamily: "'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
+          <nav className="nav-inner">
+            <div className="nav-logo-group">
               <Link
                 href="/"
                 style={{
@@ -68,14 +58,7 @@ export default function RootLayout({
               >
                 certmin
               </Link>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "28px",
-                  fontSize: "0.88em",
-                  letterSpacing: "-0.01em",
-                }}
-              >
+              <div className="nav-links">
                 <Link href="/" className="nav-link">홈</Link>
                 <Link href="/blog" className="nav-link">글 목록</Link>
               </div>

@@ -8,6 +8,7 @@ import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
 import type { ReactNode } from 'react';
 import TableOfContents, { type TocHeading } from '@/app/components/TableOfContents';
+import CodeBlock from '@/app/components/CodeBlock';
 
 function slugify(text: string): string {
   return text
@@ -27,7 +28,7 @@ function extractHeadings(content: string): TocHeading[] {
     const m = line.match(/^(#{1,2})\s+(.+)$/);
     if (!m) continue;
     const level = m[1].length;
-    const text = m[2].trim().replace(/`([^`]+)`/g, '$1').replace(/\*\*?([^*]+)\*\*?/g, '$1');
+    const text = m[2].trim().replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/`([^`]+)`/g, '$1').replace(/\*\*?([^*]+)\*\*?/g, '$1');
     let id = slugify(m[2]);
     idCount[id] = (idCount[id] ?? 0) + 1;
     if (idCount[id] > 1) id = `${id}-${idCount[id]}`;
@@ -278,7 +279,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 code: ({ className, children, ...props }) => (
                   <code className={className} {...props}>{children}</code>
                 ),
-                pre: ({ children }) => <pre>{children}</pre>,
+                pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
                 blockquote: ({ children }) => <blockquote>{children}</blockquote>,
                 a: ({ href, children }) => <a href={href}>{children}</a>,
                 hr: () => <hr />,

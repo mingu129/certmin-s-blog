@@ -14,21 +14,25 @@ export default function ProfileSidebar({ profileName, profileDescription, profil
       <div className="sidebar-block">
         <div className="sidebar-block-title">소개</div>
         <div className="sidebar-about">
-          <div
-            style={{
-              width: '88px', height: '88px', borderRadius: '50%',
-              background: 'var(--surface-high)', display: 'flex',
-              alignItems: 'center', justifyContent: 'center',
-              marginBottom: '16px', overflow: 'hidden',
-              border: '2px solid var(--accent-soft-hover)', flexShrink: 0,
-            }}
-          >
-            {profilePhoto ? (
-              <Image src={profilePhoto} alt={profileName} width={88} height={88} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized />
-            ) : (
-              <span className="material-symbols-outlined" style={{ color: 'var(--primary-fixed)', fontSize: '36px' }}>person</span>
-            )}
+
+          <div style={{ position: 'relative', width: 136, height: 136, flexShrink: 0, marginBottom: 16 }}>
+            <div style={{ position: 'absolute', top: 10, left: 10, width: 116, height: 116 }}>
+              {profilePhoto ? (
+                <Image src={profilePhoto} alt={profileName} fill style={{ objectFit: 'cover' }} unoptimized />
+              ) : (
+                <div style={{ position: 'absolute', inset: 0, background: '#05080f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className="material-symbols-outlined" style={{ color: 'var(--primary-fixed)', fontSize: '26px' }}>person</span>
+                </div>
+              )}
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/scFrameCropped.png"
+              alt=""
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'fill', pointerEvents: 'none', zIndex: 1 }}
+            />
           </div>
+
           <div style={{ fontWeight: 700, color: 'var(--text)', marginBottom: '8px' }}>{profileName}</div>
           <div style={{ fontSize: '0.88em', color: 'var(--text-muted)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>{profileDescription}</div>
         </div>

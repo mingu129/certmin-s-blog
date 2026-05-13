@@ -9,18 +9,9 @@ import DancingBaby from './components/DancingBaby';
 
 export const dynamic = 'force-dynamic';
 
-const DISCHARGE_DATE = new Date('2026-12-20T00:00:00+09:00');
-
-function daysUntilDischarge(): number {
-  const now = new Date();
-  const msPerDay = 1000 * 60 * 60 * 24;
-  return Math.max(0, Math.ceil((DISCHARGE_DATE.getTime() - now.getTime()) / msPerDay));
-}
-
 export default async function Home() {
   const [posts, settings] = await Promise.all([getAllPosts(), getSettings()]);
   const latestPosts = posts.slice(0, 5);
-  const daysLeft = daysUntilDischarge();
 
   const tagCounts = posts.reduce<Record<string, number>>((acc, p) => {
     (p.tags ?? []).forEach((tag) => { acc[tag] = (acc[tag] || 0) + 1; });
@@ -60,7 +51,7 @@ export default async function Home() {
             <h1
               style={{
                 fontFamily: "'DungGeunMo', monospace",
-                fontSize: '2.6em',
+                fontSize: 'clamp(1.45rem, 5.5vw, 2.6rem)',
                 fontWeight: 800,
                 color: 'var(--text)',
                 letterSpacing: '-0.02em',
@@ -78,20 +69,6 @@ export default async function Home() {
               </p>
             )}
 
-            <p style={{ fontSize: '0.9em', color: 'var(--text-muted)', letterSpacing: '-0.01em' }}>
-              {daysLeft > 0 ? (
-                <>
-                  전역까지 <strong style={{ color: 'var(--primary-fixed)' }}>{daysLeft}일</strong>
-                  <span style={{ margin: '0 10px', opacity: 0.4 }}>·</span>
-                  글 <strong style={{ color: 'var(--text)' }}>{posts.length}개</strong>
-                </>
-              ) : (
-                <>
-                  전역 완료 <span style={{ margin: '0 10px', opacity: 0.4 }}>·</span>
-                  글 <strong style={{ color: 'var(--text)' }}>{posts.length}개</strong>
-                </>
-              )}
-            </p>
           </div>
 
           {/* Recent posts */}
@@ -137,12 +114,8 @@ export default async function Home() {
                       style={{ display: 'flex', gap: '16px', alignItems: 'center', textDecoration: 'none' }}
                     >
                       <div
+                        className="post-thumb home-list-thumb"
                         style={{
-                          width: '120px',
-                          height: '67px',
-                          borderRadius: '0.45rem',
-                          overflow: 'hidden',
-                          flexShrink: 0,
                           background: post.thumbnail ? 'var(--surface-high)' : getPostGradient(post.slug),
                           position: 'relative',
                         }}
